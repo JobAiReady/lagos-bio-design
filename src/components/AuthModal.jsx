@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { X, Mail, Lock, Loader2, AlertCircle, Key } from 'lucide-react';
+import { sanitizeEmail, sanitizeText } from '../utils/sanitize';
 
 const AuthModal = ({ isOpen, onClose }) => {
     const [isSignUp, setIsSignUp] = useState(false);
@@ -20,21 +21,36 @@ const AuthModal = ({ isOpen, onClose }) => {
         setError(null);
 
         try {
+            // Sanitize and validate email
+            const sanitizedEmail = sanitizeEmail(email);
+            if (!sanitizedEmail) {
+                throw new Error('Please enter a valid email address');
+            }
+
+            // Validate password
+            if (!password || password.length < 6) {
+                throw new Error('Password must be at least 6 characters long');
+            }
+
             if (isSignUp) {
-                // Verify Access Code
-                if (accessCode !== import.meta.env.VITE_ACCESS_CODE) {
+                // Sanitize access code
+                const sanitizedAccessCode = sanitizeText(accessCode);
+                
+                // TODO: Move to server-side validation via Supabase Edge Function
+                // Verify Access Code (CLIENT-SIDE - TEMPORARY)
+                if (sanitizedAccessCode !== import.meta.env.VITE_ACCESS_CODE) {
                     throw new Error('Invalid Access Code. Please contact the administrator.');
                 }
 
                 const { error } = await supabase.auth.signUp({
-                    email,
+                    email: sanitizedEmail,
                     password,
                 });
                 if (error) throw error;
                 setShowSuccess(true);
             } else {
                 const { error } = await supabase.auth.signInWithPassword({
-                    email,
+                    email: sanitizedEmail,
                     password,
                 });
                 if (error) throw error;

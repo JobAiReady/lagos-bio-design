@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Upload, Loader2, Tag } from 'lucide-react';
 import { publishDesign } from '../lib/gallery';
+import { sanitizeText, sanitizeDescription, sanitizeTags } from '../utils/sanitize';
 
 const PublishModal = ({ isOpen, onClose, runData, user, onPublishSuccess }) => {
     const [title, setTitle] = useState('');
@@ -17,14 +18,24 @@ const PublishModal = ({ isOpen, onClose, runData, user, onPublishSuccess }) => {
         setError(null);
 
         try {
-            // Prepare tags array
-            const tagList = tags.split(',').map(t => t.trim()).filter(t => t.length > 0);
+            // Sanitize and prepare tags array
+            const tagList = sanitizeTags(
+                tags.split(',').map(t => t.trim()).filter(t => t.length > 0)
+            );
 
-            // Construct design object
+            // Validate required fields
+            const sanitizedTitle = sanitizeText(title);
+            const sanitizedDescription = sanitizeDescription(description);
+
+            if (!sanitizedTitle || sanitizedTitle.length < 3) {
+                throw new Error('Title must be at least 3 characters long');
+            }
+
+            // Construct design object with sanitized data
             const design = {
                 user_id: user.id,
-                title,
-                description,
+                title: sanitizedTitle,
+                description: sanitizedDescription,
                 tags: tagList,
                 run_id: runData?.id, // Link to the run if available
                 metrics: runData?.metrics,
