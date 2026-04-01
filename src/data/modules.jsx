@@ -17,6 +17,8 @@ export const modules = [
         ],
         caseStudy: "The 'Yaba Manifesto' for Biotech: Leapfrogging legacy systems.",
         lab: "Setup: Python, PyMOL, and ColabFold environments.",
+        requiresGpu: false,
+        colabUrl: "https://colab.research.google.com/github/JobAiReady/lagos-bio-design/blob/main/notebooks/Module1_Setup.ipynb",
         labContent: {
             objective: "Initialize your cloud-based bio-design environment and visualize your first protein structure.",
             prerequisites: [
@@ -28,7 +30,7 @@ export const modules = [
                 {
                     title: "Environment Setup",
                     description: "Clone the 'LagosBioBootcamp' repository and install dependencies in a fresh Google Colab environment.",
-                    code: "!git clone https://github.com/LagosBioBootcamp/lab-env.git\n%cd lab-env\n!pip install -r requirements.txt"
+                    code: "!git clone https://github.com/JobAiReady/lagos-bio-design.git\n%cd lagos-bio-design\n!pip install -r requirements.txt"
                 },
                 {
                     title: "AlphaFold 3 Inference",
@@ -59,6 +61,8 @@ export const modules = [
         ],
         caseStudy: "Designing a heat-stable industrial lipase (2025 breakthrough).",
         lab: "Pipeline Construction: Linking RFDiffusion output to ProteinMPNN.",
+        requiresGpu: true,
+        colabUrl: "https://colab.research.google.com/github/JobAiReady/lagos-bio-design/blob/main/notebooks/Module2_Pipeline.ipynb",
         labContent: {
             objective: "Create a de novo protein backbone using RFDiffusion and generate a sequence for it using ProteinMPNN.",
             prerequisites: [
@@ -100,6 +104,8 @@ export const modules = [
         ],
         caseStudy: "AlphaDesign: Creating inhibitors for bacterial defense systems.",
         lab: "In-silico Design: Generating a binder for a generic target.",
+        requiresGpu: true,
+        colabUrl: "https://colab.research.google.com/github/JobAiReady/lagos-bio-design/blob/main/notebooks/Module3_Binder.ipynb",
         labContent: {
             objective: "Design a protein binder that attaches to a specific target surface (e.g., Spike Protein).",
             prerequisites: [
@@ -140,6 +146,8 @@ export const modules = [
         ],
         caseStudy: "ACEGID's Lassa Fever rapid test & PfCTMAG Malaria vaccine candidates.",
         lab: "Capstone: Design a novel antigen binder for a Lassa virus glycoprotein.",
+        requiresGpu: true,
+        colabUrl: "https://colab.research.google.com/github/JobAiReady/lagos-bio-design/blob/main/notebooks/Module4_Capstone.ipynb",
         labContent: {
             objective: "Apply your skills to design a potential diagnostic binder for Lassa Virus Glycoprotein (GPC).",
             prerequisites: [
@@ -180,6 +188,8 @@ export const modules = [
         ],
         caseStudy: "Regulatory frameworks for biotech startups in Lagos.",
         lab: "Final Presentation: The 'Pitch' to Lagos Angel Network.",
+        requiresGpu: false,
+        colabUrl: null,
         labContent: {
             objective: "Present your Capstone project as a viable biotech startup pitch.",
             prerequisites: [
