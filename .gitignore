@@ -31,3 +31,6 @@ deploy_key.pub
 *.njsproj
 *.sln
 *.sw?
+
+# Local Netlify folder
+.netlify

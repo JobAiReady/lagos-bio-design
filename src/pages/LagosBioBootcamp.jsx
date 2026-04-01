@@ -17,8 +17,10 @@ import {
     Terminal,
     Lock
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import JobAiReadyHeader from '../components/JobAiReadyHeader';
+import AuthModal from '../components/AuthModal';
 import LabDetail from '../components/LabDetail';
 import { modules as modulesData } from '../data/modules.jsx';
 
@@ -117,6 +119,8 @@ export default function LagosBioBootcamp() {
     const [selectedLab, setSelectedLab] = useState(null);
     const [moduleProgress, setModuleProgress] = useState({});
     const [user, setUser] = useState(null);
+    const [isAuthOpen, setIsAuthOpen] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
         // Check auth state
@@ -205,8 +209,11 @@ export default function LagosBioBootcamp() {
                             >
                                 Mission
                             </button>
-                            <button className="bg-white text-slate-900 px-4 py-2 rounded-md text-sm font-bold hover:bg-slate-200 transition-colors shadow-lg shadow-white/5">
-                                Apply Now
+                            <button
+                                onClick={() => user ? navigate('/workspace') : setIsAuthOpen(true)}
+                                className="bg-white text-slate-900 px-4 py-2 rounded-md text-sm font-bold hover:bg-slate-200 transition-colors shadow-lg shadow-white/5"
+                            >
+                                {user ? 'Enter Workspace' : 'Apply Now'}
                             </button>
                         </div>
                     </div>
@@ -328,6 +335,7 @@ export default function LagosBioBootcamp() {
             </footer>
 
             <LabDetail module={selectedLab} onClose={() => setSelectedLab(null)} />
+            <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
         </div>
     );
 }
