@@ -189,7 +189,7 @@ export default function LagosBioBootcamp() {
                             </div>
                             <div>
                                 <h1 className="text-xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">Lagos Bio-Design Bootcamp</h1>
-                                <p className="text-xs text-emerald-500 font-mono tracking-wider">BATCH 01 • YABA 2025</p>
+                                <p className="text-xs text-emerald-500 font-mono tracking-wider">BATCH 01 • YABA 2026</p>
                             </div>
                         </div>
                         <div className="hidden md:flex items-center space-x-8">
@@ -322,7 +322,7 @@ export default function LagosBioBootcamp() {
 
             <footer className="bg-slate-950 text-slate-500 py-12 border-t border-slate-800">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <p className="mb-4">© 2025 Lagos Bio-Design Bootcamp. All rights reserved.</p>
+                    <p className="mb-4">© 2026 Lagos Bio-Design Bootcamp. All rights reserved.</p>
                     <p className="text-xs font-mono text-emerald-900/50">Powered by JobAiReady.ai Intelligence Layer</p>
                 </div>
             </footer>
