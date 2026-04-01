@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
     Terminal, FileCode, Play, Save, Settings,
     FolderOpen, ChevronRight, ChevronDown, X,
@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import PublishModal from '../components/PublishModal';
 import AiAssistant from '../components/AiAssistant';
+import CodeEditor from '../components/CodeEditor';
 import { useNavigate } from 'react-router-dom';
 import { loadPyodide, runPythonScript } from '../utils/pyodideManager';
 import ErrorBoundary from '../components/ErrorBoundary';
@@ -74,11 +75,13 @@ const WorkspaceContent = () => {
         outputEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [output]);
 
-    const files = [
-        { name: 'script.py', type: 'python', content: 'import torch\nimport esm\n\nprint("Loading ESM-2 model...")\n# Load ESM-2 model (Simulated)\nmodel, alphabet = esm.pretrained.esm2_t33_650M_UR50D()\nbatch_converter = alphabet.get_batch_converter()\n\nprint("Model loaded successfully.")\nprint("Ready for inference.")' },
+    const DEFAULT_FILES = [
+        { name: 'script.py', type: 'python', content: '# Protein Design Lab - Intro Script\nimport numpy as np\n\n# Generate a random protein-like sequence\namino_acids = list("ACDEFGHIKLMNPQRSTVWY")\nseq_length = 50\nsequence = "".join(np.random.choice(amino_acids, seq_length))\n\nprint(f"Generated sequence ({seq_length} residues):")\nprint(sequence)\nprint(f"\nMolecular weight estimate: {seq_length * 110:.0f} Da")\nprint("\nNote: For GPU-heavy tools (AlphaFold, RFDiffusion),")\nprint("use the Open in Colab button in the Lab view.")' },
         { name: 'config.yaml', type: 'yaml', content: 'model:\n  name: esm2_t33_650M_UR50D\n  weights: true\n\ninference:\n  batch_size: 1' },
-        { name: 'README.md', type: 'markdown', content: '# Protein Design Lab\n\nWelcome to the workspace. Use this environment to run your protein design experiments.' }
+        { name: 'README.md', type: 'markdown', content: '# Protein Design Lab\n\nWelcome to the workspace. Use this environment to run your protein design experiments.\n\n## Running Code\n- Edit script.py and click RUN SCRIPT\n- Python runs in-browser via Pyodide (numpy available)\n- For GPU tools, use Google Colab notebooks from the Lab view' }
     ];
+
+    const [files, setFiles] = useState(DEFAULT_FILES);
 
     const handleRun = async () => {
         if (!isPythonReady) return;
@@ -102,7 +105,15 @@ const WorkspaceContent = () => {
         setIsRunning(false);
     };
 
-    const activeFileContent = files.find(f => f.name === activeFile)?.content || '';
+    const activeFileObj = files.find(f => f.name === activeFile);
+    const activeFileContent = activeFileObj?.content || '';
+    const activeFileType = activeFileObj?.type || 'python';
+
+    const handleEditorChange = useCallback((newContent) => {
+        setFiles(prev => prev.map(f =>
+            f.name === activeFile ? { ...f, content: newContent } : f
+        ));
+    }, [activeFile]);
 
     return (
         <div className="h-screen w-full bg-[#0f172a] text-slate-300 flex flex-col font-mono overflow-hidden">
@@ -257,19 +268,12 @@ const WorkspaceContent = () => {
                     </div>
 
                     {/* Code Editor */}
-                    <div className="flex-1 p-4 sm:p-6 overflow-auto font-mono text-sm leading-relaxed">
-                        <div className="flex">
-                            <div className="flex flex-col text-right pr-4 text-slate-600 select-none hidden sm:flex">
-                                {activeFileContent.split('\n').map((_, i) => (
-                                    <span key={i} className="h-6">{i + 1}</span>
-                                ))}
-                            </div>
-                            <div className="flex-1 text-slate-300 whitespace-pre overflow-x-auto">
-                                {activeFileContent.split('\n').map((line, i) => (
-                                    <div key={i} className="h-6">{line}</div>
-                                ))}
-                            </div>
-                        </div>
+                    <div className="flex-1 overflow-hidden">
+                        <CodeEditor
+                            value={activeFileContent}
+                            onChange={handleEditorChange}
+                            language={activeFileType}
+                        />
                     </div>
 
                     {/* Terminal */}
