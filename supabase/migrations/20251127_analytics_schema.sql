@@ -23,13 +23,11 @@ create policy "Users can view their own events"
 -- Policy: Admins can view all events
 -- For MVP, we'll hardcode the admin email or use a specific claim if available.
 -- Ideally, you'd have an 'admins' table or role.
--- REPLACE 'josepholadiran93@gmail.com' with the actual admin email if known, 
--- or use a broader check if you have an admin role.
+-- Uses admin_roles table for role-based access (see migrations/20260401_admin_roles.sql)
 create policy "Admins can view all events"
   on public.analytics_events for select
   using (
-    auth.jwt() ->> 'email' = 'josepholadiran93@gmail.com' 
-    -- OR auth.uid() in (select user_id from admin_users) -- Future proofing
+    auth.uid() in (select user_id from public.admin_roles)
   );
 
 -- Index for performance

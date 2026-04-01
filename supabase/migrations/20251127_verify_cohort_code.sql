@@ -11,7 +11,7 @@ declare
 begin
   -- In a real production app, you might store this in a 'secrets' table
   -- or use Vault. For now, we hardcode it in the function which is hidden from clients.
-  valid_code := 'YABA-2025';
+  valid_code := 'YOUR-ACCESS-CODE';
   
   return code = valid_code;
 end;

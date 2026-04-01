@@ -61,7 +61,7 @@
 c:\dev\LBD\.env
 VITE_SUPABASE_URL=https://hvxkrsxckbslotqopodz.supabase.co
 VITE_SUPABASE_ANON_KEY=sb_publishable_bSsZ2LSGTrVvL0ZRYtuh6g_R9UqWVkW
-VITE_ACCESS_CODE=YABA-2025
+VITE_ACCESS_CODE=your_cohort_code_here
 ```
 
 #### Solution Steps
@@ -415,7 +415,7 @@ Thumbs.db
    ```
    VITE_SUPABASE_URL=https://your-project.supabase.co
    VITE_SUPABASE_ANON_KEY=your_anon_key
-   VITE_ACCESS_CODE=YABA-2025
+   VITE_ACCESS_CODE=your_cohort_code_here
    ```
 
 4. Install dependencies:

@@ -377,7 +377,7 @@ describe('AuthModal', () => {
       await userEvent.click(screen.getByText('Sign Up'));
       await userEvent.type(screen.getByPlaceholderText('name@example.com'), 'new@example.com');
       await userEvent.type(screen.getByPlaceholderText('••••••••'), 'password123');
-      await userEvent.type(screen.getByPlaceholderText('Enter cohort code'), 'YABA-2025');
+      await userEvent.type(screen.getByPlaceholderText('Enter cohort code'), 'TEST-ACCESS-CODE');
       await userEvent.click(screen.getByRole('button', { name: /sign up/i }));
       
       await waitFor(() => {
@@ -781,7 +781,7 @@ test.describe('Complete Module Flow', () => {
     await page.click('text=Sign Up');
     await page.fill('input[type="email"]', 'newuser@example.com');
     await page.fill('input[type="password"]', 'SecurePass123!');
-    await page.fill('input[placeholder*="cohort"]', 'YABA-2025');
+    await page.fill('input[placeholder*="cohort"]', 'TEST-ACCESS-CODE');
     await page.click('button:has-text("Sign Up")');
 
     // Check email confirmation message

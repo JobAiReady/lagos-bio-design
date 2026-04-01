@@ -211,7 +211,7 @@ CREATE TABLE public.user_progress (
 
 ## 👏 Contributors
 
-- **Primary Engineer**: User (josepholadiran93@gmail.com)
+- **Primary Engineer**: Joseph Oladiran
 - **AI Assistant**: Cascade (Security recommendations, migration scripts)
 - **External Consultation**: Gemini 3 (Modal UI fixes)
 

@@ -391,7 +391,7 @@ test('user can sign up with valid code', async ({ page }) => {
   // Fill sign up form
   await page.fill('input[type="email"]', 'test@example.com');
   await page.fill('input[type="password"]', 'SecurePass123');
-  await page.fill('input[placeholder*="cohort"]', 'YABA-2025');
+  await page.fill('input[placeholder*="cohort"]', 'TEST-ACCESS-CODE');
   
   // Submit
   await page.click('button:has-text("Sign Up")');
