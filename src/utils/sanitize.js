@@ -22,7 +22,9 @@ export const sanitizeText = (input) => {
   if (typeof input !== 'string') return '';
   
   return input
-    .replace(/<[^>]*>/g, '') // Remove all HTML tags
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') // Remove script tags and content
+    .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')    // Remove style tags and content
+    .replace(/<[^>]*>/g, '') // Remove remaining HTML tags
     .replace(/[<>]/g, '')     // Remove remaining < and >
     .trim();                   // Remove leading/trailing whitespace
 };
@@ -129,10 +131,11 @@ export const sanitizeFilename = (filename) => {
   if (typeof filename !== 'string') return 'untitled';
   
   return filename
+    .replace(/\.\.[\\/]*/g, '')        // Remove directory traversal (../ and ..\)
     .replace(/[^a-zA-Z0-9._-]/g, '-')  // Replace unsafe chars with dash
-    .replace(/\.{2,}/g, '.')            // Remove directory traversal (..)
     .replace(/^\.+/, '')                // Remove leading dots
     .replace(/-{2,}/g, '-')             // Replace multiple dashes with single
+    .replace(/^-+/, '')                  // Remove leading dashes
     .toLowerCase()                       // Lowercase for consistency
     .substring(0, 255);                  // Enforce max filename length
 };
