@@ -188,6 +188,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 For third-party tool attributions (AlphaFold, RFDiffusion, ProteinMPNN, ESM-2, PDB data), see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
+For important disclaimers regarding educational use, computational predictions, and biosecurity content, see [DISCLAIMER.md](DISCLAIMER.md).
+
 ## 👥 Team
 
 **Project Lead**: JobAiReady.ai  

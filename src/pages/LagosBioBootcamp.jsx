@@ -345,6 +345,7 @@ export default function LagosBioBootcamp() {
             <footer className="bg-slate-950 text-slate-500 py-12 border-t border-slate-800">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                     <p className="mb-4">© 2026 Lagos Bio-Design Bootcamp. All rights reserved.</p>
+                    <p className="text-xs text-slate-600 mb-3">For educational and research training purposes only. Not medical advice. Computational predictions are not experimental results.</p>
                     <p className="text-xs font-mono text-emerald-900/50">Powered by JobAiReady.ai Intelligence Layer</p>
                 </div>
             </footer>
