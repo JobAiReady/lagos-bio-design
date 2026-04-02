@@ -226,12 +226,12 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'signin' }) => {
     return (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm">
             <div className="flex min-h-full items-center justify-center p-4">
-                <div className="bg-slate-900 border border-slate-800 rounded-xl shadow-2xl w-full max-w-md animate-in fade-in zoom-in duration-200">
+                <div role="dialog" aria-modal="true" aria-labelledby="auth-modal-title" className="bg-slate-900 border border-slate-800 rounded-xl shadow-2xl w-full max-w-md animate-in fade-in zoom-in duration-200">
                     <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-950/50">
-                        <h2 className="text-xl font-bold text-slate-100">
+                        <h2 id="auth-modal-title" className="text-xl font-bold text-slate-100">
                             {isSignUp ? 'Create Account' : 'Welcome Back'}
                         </h2>
-                        <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors">
+                        <button onClick={onClose} aria-label="Close" className="text-slate-400 hover:text-white transition-colors">
                             <X size={20} />
                         </button>
                     </div>

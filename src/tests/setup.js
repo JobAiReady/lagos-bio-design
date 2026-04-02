@@ -16,7 +16,7 @@ vi.stubEnv('VITE_SUPABASE_ANON_KEY', 'test-anon-key');
 vi.stubEnv('VITE_ACCESS_CODE', 'TEST-CODE');
 
 // Mock console methods to reduce test noise (optional)
-global.console = {
+globalThis.console = {
   ...console,
   // Uncomment to silence console.log in tests
   // log: vi.fn(),

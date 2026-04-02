@@ -42,29 +42,23 @@ const AdminDashboard = () => {
                 console.error('Error fetching analytics:', error);
             } else {
                 setEvents(data);
-                processStats(data);
+                // Process stats inline
+                const uniqueUsers = new Set(data.map(e => e.user_id)).size;
+                const errors = data.filter(e => e.event_type === 'error').length;
+                const heartbeats = data.filter(e => e.event_type === 'heartbeat').length;
+                const totalMinutes = heartbeats;
+                const avgMinutes = uniqueUsers > 0 ? Math.round(totalMinutes / uniqueUsers) : 0;
+                setStats({
+                    totalUsers: uniqueUsers,
+                    totalErrors: errors,
+                    avgTimeOnTask: avgMinutes
+                });
             }
             setLoading(false);
         };
 
         checkAccessAndFetch();
     }, [authLoading, user, navigate]);
-
-    const processStats = (data) => {
-        const uniqueUsers = new Set(data.map(e => e.user_id)).size;
-        const errors = data.filter(e => e.event_type === 'error').length;
-        const heartbeats = data.filter(e => e.event_type === 'heartbeat').length;
-
-        // Rough estimate: 1 heartbeat = 1 minute
-        const totalMinutes = heartbeats;
-        const avgMinutes = uniqueUsers > 0 ? Math.round(totalMinutes / uniqueUsers) : 0;
-
-        setStats({
-            totalUsers: uniqueUsers,
-            totalErrors: errors,
-            avgTimeOnTask: avgMinutes
-        });
-    };
 
     // Prepare chart data
     const eventsByType = events.reduce((acc, curr) => {

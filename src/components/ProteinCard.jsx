@@ -2,7 +2,7 @@ import React from 'react';
 import { User, Box, Tag } from 'lucide-react';
 
 const ProteinCard = ({ design }) => {
-    const { title, description, tags, profiles, thumbnail_url, created_at } = design;
+    const { title, description: _description, tags, profiles, thumbnail_url, created_at } = design;
 
     return (
         <div className="bg-slate-900/50 border border-slate-700/50 rounded-xl overflow-hidden hover:border-emerald-500/50 transition-all group">

@@ -5,7 +5,7 @@ export const uploadPDB = async (file, userId) => {
     // Create a unique path: user_id/timestamp_filename
     const fileName = `${userId}/${Date.now()}_${file.name}`;
 
-    const { data, error } = await supabase.storage
+    const { data: _uploadData, error } = await supabase.storage
         .from('designs')
         .upload(fileName, file);
 

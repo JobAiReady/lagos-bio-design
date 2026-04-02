@@ -6,7 +6,7 @@ const LabDetail = ({ module, onClose }) => {
     const [completedSteps, setCompletedSteps] = useState([]);
 
     const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [_loading, setLoading] = useState(true);
 
     // Check auth state
     useEffect(() => {
@@ -23,7 +23,7 @@ const LabDetail = ({ module, onClose }) => {
 
             if (user) {
                 // Load from Supabase
-                const { data, error } = await supabase
+                const { data, error: _fetchError } = await supabase
                     .from('user_progress')
                     .select('completed_steps')
                     .eq('user_id', user.id)

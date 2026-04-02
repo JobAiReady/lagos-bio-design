@@ -168,7 +168,7 @@ export const sanitizeUrl = (url, options = {}) => {
     }
     
     return parsed.href;
-  } catch (e) {
+  } catch {
     // Invalid URL
     return null;
   }
