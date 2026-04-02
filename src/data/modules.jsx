@@ -189,7 +189,7 @@ export const modules = [
         caseStudy: "Regulatory frameworks for biotech startups in Lagos.",
         lab: "Final Presentation: The 'Pitch' to Lagos Angel Network.",
         requiresGpu: false,
-        colabUrl: null,
+        colabUrl: "https://colab.research.google.com/github/JobAiReady/lagos-bio-design/blob/main/notebooks/Module5_Ethics.ipynb",
         labContent: {
             objective: "Present your Capstone project as a viable biotech startup pitch.",
             prerequisites: [
