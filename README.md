@@ -160,10 +160,11 @@ Configure these in your deployment platform:
 
 ## 📖 Documentation
 
-- [Codebase Assessment](CODEBASE_ASSESSMENT.md) - Complete code review
-- [Remediation Roadmap](REMEDIATION_ROADMAP.md) - Improvement plan
-- [Security Checklist](SECURITY_CHECKLIST.md) - Security guidelines
-- [Test Strategy](TEST_STRATEGY.md) - Testing approach
+- [Codebase Assessment](docs/CODEBASE_ASSESSMENT.md) - Complete code review
+- [Remediation Roadmap](docs/REMEDIATION_ROADMAP.md) - Improvement plan
+- [Security Checklist](docs/SECURITY_CHECKLIST.md) - Security guidelines
+- [Test Strategy](docs/TEST_STRATEGY.md) - Testing approach
+- [Quick Start Guide](docs/QUICK_START_GUIDE.md) - Getting started
 
 ## 🤝 Contributing
 
