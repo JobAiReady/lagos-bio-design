@@ -16,14 +16,13 @@ export const modules = [
             "The Protein Functional Universe: Exploring beyond nature's saturation point."
         ],
         caseStudy: "The 'Yaba Manifesto' for Biotech: Leapfrogging legacy systems.",
-        lab: "Setup: Python, PyMOL, and ColabFold environments.",
+        lab: "Setup: Python, py3Dmol, and ColabFold environments.",
         requiresGpu: false,
         colabUrl: "https://colab.research.google.com/github/JobAiReady/lagos-bio-design/blob/main/notebooks/Module1_Setup.ipynb",
         labContent: {
             objective: "Initialize your cloud-based bio-design environment and visualize your first protein structure.",
             prerequisites: [
                 "Google Account (for Colab)",
-                "PyMOL 2.5+ installed locally",
                 "Basic Python knowledge"
             ],
             steps: [
@@ -39,11 +38,11 @@ export const modules = [
                 },
                 {
                     title: "Visualization",
-                    description: "Download the .pdb file and open it in PyMOL. Color by pLDDT (confidence).",
-                    code: "# In PyMOL command line:\nload results/insulin_rank1.pdb\nspectrum b, rainbow_rev, minimum=50, maximum=90"
+                    description: "Render the structure in interactive 3D with py3Dmol, colored by pLDDT confidence.",
+                    code: "import py3Dmol\nview = py3Dmol.view(width=800, height=500)\nview.addModel(pdb_data, 'pdb')\nview.setStyle({'cartoon': {'colorscheme': {'prop': 'b', 'gradient': 'rwb', 'min': 50, 'max': 90}}})\nview.show()"
                 }
             ],
-            deliverable: "A screenshot of your PyMOL workspace showing the insulin structure colored by confidence."
+            deliverable: "A screenshot of your interactive 3D visualization showing the insulin structure colored by confidence."
         }
     },
     {
