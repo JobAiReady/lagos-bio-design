@@ -1,7 +1,10 @@
 {
-  "name": "temp_app",
+  "name": "lagos-bio-design",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": "JobAiReady.ai",
+  "description": "Lagos Bio-Design Bootcamp — interactive platform for learning generative protein design",
   "type": "module",
   "scripts": {
     "dev": "vite",

@@ -34,3 +34,13 @@ deploy_key.pub
 
 # Local Netlify folder
 .netlify
+
+# Dev artifacts / scratch SQL
+*.sql
+!supabase/migrations/*.sql
+
+# AI conversation logs
+CONTEXTUAL_CONVERSATION.md
+PREVIOUS_CONVERSATION.md
+SESSION_SUMMARY.md
+build_log.txt

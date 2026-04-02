@@ -27,7 +27,7 @@ The Lagos Bio-Design Bootcamp is an 8-week intensive program teaching cutting-ed
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/your-org/lagos-bio-design.git
+   git clone https://github.com/JobAiReady/lagos-bio-design.git
    cd lagos-bio-design
    ```
 
@@ -185,20 +185,26 @@ Please ensure:
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+For third-party tool attributions (AlphaFold, RFDiffusion, ProteinMPNN, ESM-2, PDB data), see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
 ## 👥 Team
 
 **Project Lead**: JobAiReady.ai  
-**Contributors**: See [GitHub Contributors](https://github.com/your-org/lagos-bio-design/graphs/contributors)
+**Contributors**: See [GitHub Contributors](https://github.com/JobAiReady/lagos-bio-design/graphs/contributors)
 
 ## 📧 Contact
 
 - **Website**: [https://jobaiready.ai](https://jobaiready.ai)
 - **Email**: info@jobaiready.ai
-- **Issues**: [GitHub Issues](https://github.com/your-org/lagos-bio-design/issues)
+- **Issues**: [GitHub Issues](https://github.com/JobAiReady/lagos-bio-design/issues)
 
 ## 🙏 Acknowledgments
 
-- Inspired by AlphaFold, RFDiffusion, and ProteinMPNN research
+- **AlphaFold** (Google DeepMind / EMBL-EBI) — structure prediction and database (CC-BY-4.0)
+- **RFDiffusion** (Baker Lab, UW) — backbone generation (BSD-3-Clause)
+- **ProteinMPNN** (Dauparas et al.) — inverse folding (MIT)
+- **ESM-2 & ESMFold** (Meta AI) — protein language model and structure prediction (MIT)
+- **RCSB PDB** — protein structure data (public domain)
 - Built for the Lagos tech ecosystem
 - Powered by Supabase and modern web technologies
 - Special thanks to the Nigerian biotech community
@@ -209,14 +215,13 @@ Found a security vulnerability? Please email security@jobaiready.ai instead of u
 
 ## 📊 Current Status
 
-⚠️ **Development Phase**: This project is under active development. See [REMEDIATION_ROADMAP.md](REMEDIATION_ROADMAP.md) for current progress.
+**Live at**: [bootcamp.jobaiready.ai](https://bootcamp.jobaiready.ai)
 
-**Next Milestones**:
-- [ ] Complete security fixes
-- [ ] Achieve 70% test coverage
-- [ ] Deploy to staging
-- [ ] User acceptance testing
-- [ ] Production launch
+- [x] Security remediation (Phase 1)
+- [x] 64/64 tests passing
+- [x] Production deployment with SSL
+- [x] 5 GPU-enabled Colab notebooks
+- [x] Instructional lesson layer (Option D)
 
 ---
 
