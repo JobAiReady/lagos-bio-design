@@ -13,6 +13,13 @@ function App() {
           <Route path="/" element={<LagosBioBootcamp />} />
           <Route path="/workspace" element={<Workspace />} />
           <Route path="/gallery" element={<Gallery />} />
+          <Route path="*" element={
+            <div className="h-screen w-full bg-slate-950 flex flex-col items-center justify-center text-center px-4">
+              <h1 className="text-6xl font-bold text-emerald-500 mb-4">404</h1>
+              <p className="text-slate-400 mb-6">This page doesn't exist.</p>
+              <a href="/" className="text-sm px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition-all">Back to Bootcamp</a>
+            </div>
+          } />
         </Routes>
       </Suspense>
     </Router>

@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://bootcamp.jobaiready.ai/sitemap.xml
