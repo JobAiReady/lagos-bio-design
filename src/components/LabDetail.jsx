@@ -206,6 +206,17 @@ const LabDetail = ({ module, onClose }) => {
                                 </ul>
                             </div>
 
+                            {module.colabUrl && (
+                                <a
+                                    href={module.colabUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg shadow-lg shadow-blue-900/20 transition-all flex items-center justify-center gap-2 mb-3"
+                                >
+                                    <FileCode size={18} /> Open in Colab
+                                </a>
+                            )}
+
                             <button
                                 onClick={() => window.location.href = '/workspace'}
                                 className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-lg shadow-lg shadow-emerald-900/20 transition-all flex items-center justify-center gap-2"

@@ -22,9 +22,10 @@ import { supabase } from '../lib/supabase';
 import JobAiReadyHeader from '../components/JobAiReadyHeader';
 import AuthModal from '../components/AuthModal';
 import LabDetail from '../components/LabDetail';
+import LessonPanel from '../components/LessonPanel';
 import { modules as modulesData } from '../data/modules.jsx';
 
-const CourseModule = ({ module, isOpen, toggle, progress, user }) => {
+const CourseModule = ({ module, isOpen, toggle, progress, user, onOpenLesson }) => {
     return (
         <div className="border border-emerald-500/20 rounded-lg mb-4 overflow-hidden shadow-sm hover:shadow-emerald-500/10 transition-all bg-slate-900/50 backdrop-blur-sm">
             <button
@@ -87,6 +88,18 @@ const CourseModule = ({ module, isOpen, toggle, progress, user }) => {
                                     <FlaskConical size={16} />
                                     {module.lab}
                                 </span>
+                                {module.lessonContent && (
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            onOpenLesson();
+                                        }}
+                                        className="text-xs px-3 py-1.5 rounded border transition-all flex items-center gap-1 bg-blue-900/50 hover:bg-blue-600 text-blue-400 hover:text-white border-blue-500/30"
+                                    >
+                                        <BookOpen size={12} />
+                                        Study Lesson
+                                    </button>
+                                )}
                                 <button
                                     onClick={(e) => {
                                         e.stopPropagation();
@@ -117,6 +130,7 @@ export default function LagosBioBootcamp() {
     const [openModule, setOpenModule] = useState(0);
     const [activeTab, setActiveTab] = useState('curriculum');
     const [selectedLab, setSelectedLab] = useState(null);
+    const [selectedLesson, setSelectedLesson] = useState(null);
     const [moduleProgress, setModuleProgress] = useState({});
     const [user, setUser] = useState(null);
     const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -282,6 +296,7 @@ export default function LagosBioBootcamp() {
                                     toggle={() => setOpenModule(index === openModule ? -1 : index)}
                                     progress={moduleProgress[mod.title] || 0}
                                     user={user}
+                                    onOpenLesson={() => setSelectedLesson(mod)}
                                 />
                             ))}
                         </div>
@@ -335,6 +350,11 @@ export default function LagosBioBootcamp() {
             </footer>
 
             <LabDetail module={selectedLab} onClose={() => setSelectedLab(null)} />
+            <LessonPanel
+                module={selectedLesson}
+                onClose={() => setSelectedLesson(null)}
+                onOpenLab={() => { setSelectedLesson(null); setSelectedLab(selectedLesson); }}
+            />
             <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
         </div>
     );
