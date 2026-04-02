@@ -16,7 +16,7 @@ const languageMap = {
   markdown: markdown,
 };
 
-const CodeEditor = ({ value, onChange, language = 'python', readOnly = false }) => {
+const CodeEditor = ({ value, onChange, language = 'python', readOnly = false, fontSize = 14, wordWrap = true }) => {
   const editorRef = useRef(null);
   const viewRef = useRef(null);
   const onChangeRef = useRef(onChange);
@@ -44,7 +44,7 @@ const CodeEditor = ({ value, onChange, language = 'python', readOnly = false }) 
       EditorView.theme({
         '&': {
           height: '100%',
-          fontSize: '14px',
+          fontSize: `${fontSize}px`,
         },
         '.cm-scroller': {
           fontFamily: '"JetBrains Mono", "Fira Code", "Cascadia Code", monospace',
@@ -68,6 +68,10 @@ const CodeEditor = ({ value, onChange, language = 'python', readOnly = false }) 
       }),
     ];
 
+    if (wordWrap) {
+      extensions.push(EditorView.lineWrapping);
+    }
+
     if (readOnly) {
       extensions.push(EditorState.readOnly.of(true));
     }
@@ -87,7 +91,7 @@ const CodeEditor = ({ value, onChange, language = 'python', readOnly = false }) 
     return () => {
       view.destroy();
     };
-  }, [language, readOnly]);
+  }, [language, readOnly, fontSize, wordWrap]);
 
   // Update content when value prop changes externally (e.g. switching files)
   useEffect(() => {
