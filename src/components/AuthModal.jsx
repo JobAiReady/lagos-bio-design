@@ -33,8 +33,29 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'signin' }) => {
     const [error, setError] = useState(null);
 
     const [showSuccess, setShowSuccess] = useState(false);
+    const [resetMode, setResetMode] = useState(false);
+    const [resetSent, setResetSent] = useState(false);
 
     if (!isOpen) return null;
+
+    const handleResetPassword = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError(null);
+        try {
+            const sanitizedEmail = sanitizeEmail(email);
+            if (!sanitizedEmail) throw new Error('Please enter a valid email address');
+            const { error } = await supabase.auth.resetPasswordForEmail(sanitizedEmail, {
+                redirectTo: window.location.origin,
+            });
+            if (error) throw error;
+            setResetSent(true);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleAuth = async (e) => {
         e.preventDefault();
@@ -81,6 +102,86 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'signin' }) => {
             setLoading(false);
         }
     };
+
+    if (resetSent) {
+        return (
+            <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm">
+                <div className="flex min-h-full items-center justify-center p-4">
+                    <div className="bg-slate-900 border border-slate-800 rounded-xl shadow-2xl w-full max-w-md animate-in fade-in zoom-in duration-200 p-8 text-center">
+                        <div className="w-16 h-16 bg-emerald-900/30 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-500/30">
+                            <Mail className="text-emerald-500" size={32} />
+                        </div>
+                        <h2 className="text-2xl font-bold text-white mb-2">Check Your Email</h2>
+                        <p className="text-slate-400 mb-6">
+                            We&apos;ve sent a password reset link to <span className="text-emerald-400">{email}</span>.
+                        </p>
+                        <button
+                            onClick={() => { setResetMode(false); setResetSent(false); onClose(); }}
+                            className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-lg transition-all"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (resetMode) {
+        return (
+            <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm">
+                <div className="flex min-h-full items-center justify-center p-4">
+                    <div className="bg-slate-900 border border-slate-800 rounded-xl shadow-2xl w-full max-w-md animate-in fade-in zoom-in duration-200">
+                        <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-950/50">
+                            <h2 className="text-xl font-bold text-slate-100">Reset Password</h2>
+                            <button onClick={() => { setResetMode(false); onClose(); }} className="text-slate-400 hover:text-white transition-colors">
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <form onSubmit={handleResetPassword} className="p-6 space-y-4">
+                            {error && (
+                                <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-lg text-sm flex items-center gap-2">
+                                    <AlertCircle size={16} />
+                                    {error}
+                                </div>
+                            )}
+                            <p className="text-sm text-slate-400">Enter your email and we&apos;ll send you a link to reset your password.</p>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-400">Email</label>
+                                <div className="relative">
+                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
+                                    <input
+                                        type="email"
+                                        required
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        className="w-full bg-slate-950 border border-slate-800 rounded-lg py-2.5 pl-10 pr-4 text-slate-200 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
+                                        placeholder="name@example.com"
+                                    />
+                                </div>
+                            </div>
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-lg transition-all shadow-lg shadow-emerald-900/20 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {loading ? <Loader2 className="animate-spin" size={18} /> : 'Send Reset Link'}
+                            </button>
+                            <div className="text-center">
+                                <button
+                                    type="button"
+                                    onClick={() => { setResetMode(false); setError(null); }}
+                                    className="text-sm text-emerald-400 hover:text-emerald-300 hover:underline"
+                                >
+                                    Back to Sign In
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     if (showSuccess) {
         return (
@@ -198,6 +299,18 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'signin' }) => {
                         >
                             {loading ? <Loader2 className="animate-spin" size={18} /> : (isSignUp ? 'Sign Up' : 'Sign In')}
                         </button>
+
+                        {!isSignUp && (
+                            <div className="text-center">
+                                <button
+                                    type="button"
+                                    onClick={() => { setResetMode(true); setError(null); }}
+                                    className="text-xs text-slate-500 hover:text-emerald-400 hover:underline"
+                                >
+                                    Forgot Password?
+                                </button>
+                            </div>
+                        )}
 
                         <div className="text-center text-sm text-slate-500 mt-4">
                             {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
