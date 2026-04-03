@@ -99,7 +99,7 @@ const WorkspaceContent = () => {
     }, [output]);
 
     const DEFAULT_FILES = [
-        { name: 'script.py', type: 'python', content: '# Protein Design Lab - Intro Script\nimport numpy as np\n\n# Generate a random protein-like sequence\namino_acids = list("ACDEFGHIKLMNPQRSTVWY")\nseq_length = 50\nsequence = "".join(np.random.choice(amino_acids, seq_length))\n\nprint(f"Generated sequence ({seq_length} residues):")\nprint(sequence)\nprint(f"\nMolecular weight estimate: {seq_length * 110:.0f} Da")\nprint("\nNote: For GPU-heavy tools (AlphaFold, RFDiffusion),")\nprint("use the Open in Colab button in the Lab view.")' },
+        { name: 'script.py', type: 'python', content: '# Protein Design Lab - Intro Script\nimport numpy as np\n\n# Generate a random protein-like sequence\namino_acids = list("ACDEFGHIKLMNPQRSTVWY")\nseq_length = 50\nsequence = "".join(np.random.choice(amino_acids, seq_length))\n\nprint(f"Generated sequence ({seq_length} residues):")\nprint(sequence)\nprint(f"\\nMolecular weight estimate: {seq_length * 110:.0f} Da")\nprint("\\nNote: For GPU-heavy tools (AlphaFold, RFDiffusion),")\nprint("use the Open in Colab button in the Lab view.")' },
         { name: 'config.yaml', type: 'yaml', content: 'model:\n  name: esm2_t33_650M_UR50D\n  weights: true\n\ninference:\n  batch_size: 1' },
         { name: 'README.md', type: 'markdown', content: '# Protein Design Lab\n\nWelcome to the workspace. Use this environment to run your protein design experiments.\n\n## Running Code\n- Edit script.py and click RUN SCRIPT\n- Python runs in-browser via Pyodide (numpy available)\n- For GPU tools, use Google Colab notebooks from the Lab view' }
     ];
