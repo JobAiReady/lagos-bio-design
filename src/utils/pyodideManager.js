@@ -45,8 +45,8 @@ export const loadPyodide = async () => {
         script.onload = async () => {
             try {
                 pyodideInstance = await window.loadPyodide();
-                // Load micropri for package management if needed, but we are mocking mostly
-                await pyodideInstance.loadPackage("micropip");
+                // Load core packages
+                await pyodideInstance.loadPackage(["micropip", "numpy"]);
 
                 // Apply shims
                 await pyodideInstance.runPythonAsync(MOCK_SHIMS);
