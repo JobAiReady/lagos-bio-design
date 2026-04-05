@@ -26,14 +26,14 @@ const WorkspaceContent = () => {
     const [isMobile, setIsMobile] = useState(false);
     const [isPublishOpen, setIsPublishOpen] = useState(false);
     const [isAiOpen, setIsAiOpen] = useState(false);
-    const { user, profile } = useAuth();
+    const { user, profile, loading } = useAuth();
 
     const { isPythonReady, isRunning, stage, error, output, appendOutput, retry, runScript } = usePyodide();
 
-    // Redirect if not authenticated
+    // Redirect if not authenticated (wait for auth to finish loading)
     useEffect(() => {
-        if (!user) navigate('/');
-    }, [user, navigate]);
+        if (!loading && !user) navigate('/');
+    }, [user, loading, navigate]);
 
     // Handle window resize
     useEffect(() => {
@@ -69,6 +69,14 @@ const WorkspaceContent = () => {
             f.name === activeFile ? { ...f, content: newContent } : f
         ));
     }, [activeFile]);
+
+    if (loading) {
+        return (
+            <div className="h-screen w-full bg-[#0f172a] flex items-center justify-center">
+                <div className="text-emerald-400 font-mono text-sm">Loading workspace...</div>
+            </div>
+        );
+    }
 
     return (
         <div className="h-screen w-full bg-[#0f172a] text-slate-300 flex flex-col font-mono overflow-hidden">
