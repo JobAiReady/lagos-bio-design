@@ -4,6 +4,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const ALLOWED_ORIGINS = [
   "https://bootcamp.jobaiready.ai",
   "https://lagos-bio-design.netlify.app",
+  "https://lagos-bio-design.bitter-credit-3991.workers.dev",
   "http://localhost:5173",
 ];
 
