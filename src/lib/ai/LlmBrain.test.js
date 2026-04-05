@@ -59,17 +59,31 @@ describe('LlmBrain', () => {
         ).rejects.toThrow('Function not found');
     });
 
-    it('returns fallback text when response is empty', async () => {
+    it('throws when response field is missing', async () => {
         supabase.functions.invoke.mockResolvedValueOnce({
             data: { response: null },
             error: null,
         });
 
-        const result = await LlmBrain.process({
-            message: 'Hello',
-            context: { code: '', logs: [], activeFile: 'main.py' },
+        await expect(
+            LlmBrain.process({
+                message: 'Hello',
+                context: { code: '', logs: [], activeFile: 'main.py' },
+            })
+        ).rejects.toThrow('No response field in edge function reply');
+    });
+
+    it('throws when edge function returns an API error', async () => {
+        supabase.functions.invoke.mockResolvedValueOnce({
+            data: { error: 'LLM API error', details: 'Invalid API key' },
+            error: null,
         });
 
-        expect(result.text).toBe('No response from AI.');
+        await expect(
+            LlmBrain.process({
+                message: 'Hello',
+                context: { code: '', logs: [], activeFile: 'main.py' },
+            })
+        ).rejects.toThrow('Invalid API key');
     });
 });

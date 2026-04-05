@@ -91,6 +91,7 @@ const CodeEditor = ({ value, onChange, language = 'python', readOnly = false, fo
     return () => {
       view.destroy();
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- value is intentionally excluded; external value changes are handled by the effect below
   }, [language, readOnly, fontSize, wordWrap]);
 
   // Update content when value prop changes externally (e.g. switching files)

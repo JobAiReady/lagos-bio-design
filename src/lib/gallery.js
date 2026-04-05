@@ -41,9 +41,11 @@ export const publishDesign = async (design) => {
     return data[0];
 };
 
-// Fetch all public designs for the gallery
-export const fetchGallery = async () => {
-    const { data, error } = await supabase
+// Fetch public designs for the gallery with pagination
+const PAGE_SIZE = 12;
+
+export const fetchGallery = async ({ page = 0, search = '' } = {}) => {
+    let query = supabase
         .from('protein_gallery')
         .select(`
       *,
@@ -51,10 +53,17 @@ export const fetchGallery = async () => {
         full_name,
         avatar_url
       )
-    `)
+    `, { count: 'exact' })
         .eq('is_public', true)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
+
+    if (search.trim()) {
+        query = query.or(`title.ilike.%${search.trim()}%,description.ilike.%${search.trim()}%`);
+    }
+
+    const { data, error, count } = await query;
 
     if (error) throw error;
-    return data;
+    return { data: data || [], total: count || 0, hasMore: (page + 1) * PAGE_SIZE < (count || 0) };
 };

@@ -121,48 +121,68 @@ describe('gallery', () => {
     });
 
     describe('fetchGallery', () => {
-        it('fetches public designs ordered by created_at desc', async () => {
+        function mockChain(resolvedValue) {
+            const mockRange = vi.fn().mockResolvedValueOnce(resolvedValue);
+            const mockOrder = vi.fn().mockReturnValue({ range: mockRange });
+            const mockEq = vi.fn().mockReturnValue({ order: mockOrder });
+            const mockSelect = vi.fn().mockReturnValue({ eq: mockEq });
+            supabase.from.mockReturnValueOnce({ select: mockSelect });
+            return { mockSelect, mockEq, mockOrder, mockRange };
+        }
+
+        it('fetches public designs with pagination', async () => {
             const mockDesigns = [
                 { id: '1', title: 'Design A', profiles: { full_name: 'Alice' } },
                 { id: '2', title: 'Design B', profiles: { full_name: 'Bob' } },
             ];
 
-            const mockOrder = vi.fn().mockResolvedValueOnce({ data: mockDesigns, error: null });
-            const mockEq = vi.fn().mockReturnValue({ order: mockOrder });
-            const mockSelect = vi.fn().mockReturnValue({ eq: mockEq });
-            supabase.from.mockReturnValueOnce({ select: mockSelect });
+            const { mockSelect, mockEq, mockOrder, mockRange } = mockChain({
+                data: mockDesigns, error: null, count: 2,
+            });
 
             const result = await fetchGallery();
 
             expect(supabase.from).toHaveBeenCalledWith('protein_gallery');
-            expect(mockSelect).toHaveBeenCalledWith(expect.stringContaining('profiles'));
+            expect(mockSelect).toHaveBeenCalledWith(expect.stringContaining('profiles'), { count: 'exact' });
             expect(mockEq).toHaveBeenCalledWith('is_public', true);
             expect(mockOrder).toHaveBeenCalledWith('created_at', { ascending: false });
-            expect(result).toEqual(mockDesigns);
+            expect(mockRange).toHaveBeenCalledWith(0, 11);
+            expect(result).toEqual({ data: mockDesigns, total: 2, hasMore: false });
+        });
+
+        it('returns hasMore=true when more pages exist', async () => {
+            mockChain({ data: Array(12).fill({ id: '1' }), error: null, count: 25 });
+
+            const result = await fetchGallery({ page: 0 });
+            expect(result.hasMore).toBe(true);
         });
 
         it('throws on fetch error', async () => {
-            const mockOrder = vi.fn().mockResolvedValueOnce({
-                data: null,
-                error: { message: 'Network error' },
-            });
-            const mockEq = vi.fn().mockReturnValue({ order: mockOrder });
-            const mockSelect = vi.fn().mockReturnValue({ eq: mockEq });
-            supabase.from.mockReturnValueOnce({ select: mockSelect });
+            mockChain({ data: null, error: { message: 'Network error' }, count: null });
 
-            await expect(fetchGallery()).rejects.toEqual({
-                message: 'Network error',
-            });
+            await expect(fetchGallery()).rejects.toEqual({ message: 'Network error' });
         });
 
-        it('returns empty array when no designs exist', async () => {
-            const mockOrder = vi.fn().mockResolvedValueOnce({ data: [], error: null });
+        it('returns empty data when no designs exist', async () => {
+            mockChain({ data: [], error: null, count: 0 });
+
+            const result = await fetchGallery();
+            expect(result).toEqual({ data: [], total: 0, hasMore: false });
+        });
+
+        it('passes search filter with or clause', async () => {
+            const mockOr = vi.fn().mockResolvedValueOnce({ data: [], error: null, count: 0 });
+            const mockRange = vi.fn().mockReturnValue({ or: mockOr });
+            const mockOrder = vi.fn().mockReturnValue({ range: mockRange });
             const mockEq = vi.fn().mockReturnValue({ order: mockOrder });
             const mockSelect = vi.fn().mockReturnValue({ eq: mockEq });
             supabase.from.mockReturnValueOnce({ select: mockSelect });
 
-            const result = await fetchGallery();
-            expect(result).toEqual([]);
+            await fetchGallery({ search: 'kinase' });
+
+            expect(mockOr).toHaveBeenCalledWith(
+                'title.ilike.%kinase%,description.ilike.%kinase%'
+            );
         });
     });
 });
