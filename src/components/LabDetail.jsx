@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Terminal, FileCode, CheckCircle, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useModalA11y } from '../hooks/useModalA11y';
 
 const LabDetail = ({ module, onClose }) => {
     const [completedSteps, setCompletedSteps] = useState([]);
@@ -77,6 +78,8 @@ const LabDetail = ({ module, onClose }) => {
         }
     };
 
+    const modalRef = useModalA11y(!!module, onClose);
+
     if (!module) return null;
 
     const totalSteps = module.labContent?.steps?.length || 0;
@@ -84,7 +87,7 @@ const LabDetail = ({ module, onClose }) => {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-            <div className="w-full max-w-4xl bg-slate-900 border border-emerald-500/30 rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div ref={modalRef} role="dialog" aria-modal="true" aria-label={`Lab: ${module.title}`} tabIndex={-1} className="w-full max-w-4xl bg-slate-900 border border-emerald-500/30 rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] outline-none">
 
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-slate-800 bg-slate-950">
@@ -109,6 +112,7 @@ const LabDetail = ({ module, onClose }) => {
                         </div>
                         <button
                             onClick={onClose}
+                            aria-label="Close lab"
                             className="p-2 hover:bg-slate-800 rounded-full transition-colors text-slate-400 hover:text-white"
                         >
                             <X size={24} />

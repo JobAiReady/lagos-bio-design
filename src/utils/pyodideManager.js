@@ -34,29 +34,58 @@ sys.modules['colabfold.batch'] = colabfold
 print("System: Bio-Design Libraries (Simulated) Loaded.")
 `;
 
-export const loadPyodide = async () => {
+// Loading stages with progress percentages
+const STAGES = {
+    DOWNLOADING: { label: 'Downloading Pyodide runtime', progress: 10 },
+    INITIALIZING: { label: 'Initializing Python 3.11', progress: 40 },
+    PACKAGES: { label: 'Loading packages (numpy, micropip)', progress: 70 },
+    SHIMS: { label: 'Configuring bio-design libraries', progress: 90 },
+    READY: { label: 'Ready', progress: 100 },
+};
+
+export { STAGES };
+
+export const resetPyodide = () => {
+    pyodideReadyPromise = null;
+    pyodideInstance = null;
+};
+
+export const loadPyodide = async (onProgress) => {
     if (pyodideReadyPromise) {
         return pyodideReadyPromise;
     }
 
+    const report = (stage) => {
+        if (onProgress) onProgress(stage);
+    };
+
     pyodideReadyPromise = new Promise((resolve, reject) => {
+        report(STAGES.DOWNLOADING);
+
         const script = document.createElement('script');
         script.src = PYODIDE_URL;
         script.onload = async () => {
             try {
+                report(STAGES.INITIALIZING);
                 pyodideInstance = await window.loadPyodide();
-                // Load core packages
+
+                report(STAGES.PACKAGES);
                 await pyodideInstance.loadPackage(["micropip", "numpy"]);
 
-                // Apply shims
+                report(STAGES.SHIMS);
                 await pyodideInstance.runPythonAsync(MOCK_SHIMS);
 
+                report(STAGES.READY);
                 resolve(pyodideInstance);
             } catch (err) {
+                resetPyodide();
                 reject(err);
             }
         };
-        script.onerror = (err) => reject(err);
+        script.onerror = () => {
+            resetPyodide();
+            reject(new Error('Failed to download Pyodide. Check your internet connection.'));
+        };
         document.body.appendChild(script);
     });
 

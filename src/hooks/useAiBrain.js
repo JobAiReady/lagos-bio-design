@@ -1,9 +1,11 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { HeuristicBrain } from '../lib/ai/HeuristicBrain';
+import { LlmBrain } from '../lib/ai/LlmBrain';
 
 // The "Socket" that connects the UI to the Intelligence Provider
+// Tries LlmBrain (Claude) first, falls back to HeuristicBrain on failure
 export const useAiBrain = () => {
-    const [messages, setMessages] = useState([
+    const [messages, setMessages] = useState(() => [
         {
             id: 'init',
             role: 'assistant',
@@ -12,9 +14,8 @@ export const useAiBrain = () => {
         }
     ]);
     const [isThinking, setIsThinking] = useState(false);
-
-    // Current Brain (Can be swapped for LlmBrain later)
-    const activeBrain = HeuristicBrain;
+    const [activeBrainName, setActiveBrainName] = useState(LlmBrain.name);
+    const llmAvailable = useRef(true);
 
     const sendMessage = useCallback(async (userText, context) => {
         // 1. Add User Message
@@ -28,14 +29,24 @@ export const useAiBrain = () => {
         setIsThinking(true);
 
         try {
-            // 2. Consult the Brain
-            // We pass the entire context (code, logs, file) to the brain
-            const response = await activeBrain.process({
-                message: userText,
-                context: context // { code, logs, activeFile }
-            });
+            let response;
 
-            // 3. Add Assistant Response
+            // Try LlmBrain if still available
+            if (llmAvailable.current) {
+                try {
+                    response = await LlmBrain.process({ message: userText, context });
+                    setActiveBrainName(LlmBrain.name);
+                } catch (llmError) {
+                    console.warn('LlmBrain failed, falling back to HeuristicBrain:', llmError.message);
+                    llmAvailable.current = false;
+                    setActiveBrainName(HeuristicBrain.name);
+                    response = await HeuristicBrain.process({ message: userText, context });
+                }
+            } else {
+                response = await HeuristicBrain.process({ message: userText, context });
+            }
+
+            // 2. Add Assistant Response
             const aiMsg = {
                 id: (Date.now() + 1).toString(),
                 role: 'assistant',
@@ -44,11 +55,16 @@ export const useAiBrain = () => {
                 timestamp: Date.now()
             };
 
-            // Simulate "Thinking" delay for realism (even if heuristic is instant)
-            setTimeout(() => {
+            // Simulate brief delay for heuristic responses (LLM already has natural latency)
+            if (!llmAvailable.current) {
+                setTimeout(() => {
+                    setMessages(prev => [...prev, aiMsg]);
+                    setIsThinking(false);
+                }, 800);
+            } else {
                 setMessages(prev => [...prev, aiMsg]);
                 setIsThinking(false);
-            }, 800);
+            }
 
         } catch (error) {
             console.error("Brain Failure:", error);
@@ -66,6 +82,6 @@ export const useAiBrain = () => {
         messages,
         sendMessage,
         isThinking,
-        brainName: activeBrain.name
+        brainName: activeBrainName
     };
 };

@@ -1,26 +1,44 @@
 import React, { useState } from 'react';
 import { X, BookOpen, GraduationCap, ExternalLink, HelpCircle, ChevronRight, FlaskConical } from 'lucide-react';
+import { useModalA11y } from '../hooks/useModalA11y';
 
 const LessonPanel = ({ module, onClose, onOpenLab }) => {
     const [activeSection, setActiveSection] = useState('overview');
+
+    const modalRef = useModalA11y(!!module?.lessonContent, onClose);
 
     if (!module || !module.lessonContent) return null;
 
     const { lessonContent } = module;
 
+    const renderInline = (text) => {
+        const parts = [];
+        const regex = /\*\*(.+?)\*\*|\*(.+?)\*/g;
+        let lastIndex = 0;
+        let match;
+        while ((match = regex.exec(text)) !== null) {
+            if (match.index > lastIndex) {
+                parts.push(text.slice(lastIndex, match.index));
+            }
+            if (match[1]) {
+                parts.push(<strong key={match.index} className="text-emerald-400">{match[1]}</strong>);
+            } else if (match[2]) {
+                parts.push(<em key={match.index} className="text-slate-300">{match[2]}</em>);
+            }
+            lastIndex = regex.lastIndex;
+        }
+        if (lastIndex < text.length) {
+            parts.push(text.slice(lastIndex));
+        }
+        return parts;
+    };
+
     const renderMarkdown = (text) => {
-        return text.split('\n\n').map((paragraph, i) => {
-            const formatted = paragraph
-                .replace(/\*\*(.+?)\*\*/g, '<strong class="text-emerald-400">$1</strong>')
-                .replace(/\*(.+?)\*/g, '<em class="text-slate-300">$1</em>');
-            return (
-                <p
-                    key={i}
-                    className="text-slate-300 leading-relaxed mb-4"
-                    dangerouslySetInnerHTML={{ __html: formatted }}
-                />
-            );
-        });
+        return text.split('\n\n').map((paragraph, i) => (
+            <p key={i} className="text-slate-300 leading-relaxed mb-4">
+                {renderInline(paragraph)}
+            </p>
+        ));
     };
 
     const sections = [
@@ -32,7 +50,7 @@ const LessonPanel = ({ module, onClose, onOpenLab }) => {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-            <div className="w-full max-w-4xl bg-slate-900 border border-blue-500/30 rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div ref={modalRef} role="dialog" aria-modal="true" aria-label={`Lesson: ${module.title}`} tabIndex={-1} className="w-full max-w-4xl bg-slate-900 border border-blue-500/30 rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] outline-none">
 
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-slate-800 bg-slate-950">
@@ -58,6 +76,7 @@ const LessonPanel = ({ module, onClose, onOpenLab }) => {
                         )}
                         <button
                             onClick={onClose}
+                            aria-label="Close lesson"
                             className="p-2 hover:bg-slate-800 rounded-full transition-colors text-slate-400 hover:text-white"
                         >
                             <X size={24} />

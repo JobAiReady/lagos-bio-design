@@ -76,6 +76,7 @@ const JobAiReadyHeader = () => {
                                 onClick={handleSignOut}
                                 className="text-slate-400 hover:text-red-400 transition-colors"
                                 title="Sign Out"
+                                aria-label="Sign out"
                             >
                                 <LogOut size={16} />
                             </button>

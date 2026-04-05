@@ -37,7 +37,7 @@ const AiAssistant = ({ isOpen, onClose, context }) => {
                         </div>
                     </div>
                 </div>
-                <button onClick={onClose} className="text-slate-500 hover:text-slate-300 transition-colors">
+                <button onClick={onClose} aria-label="Close AI assistant" className="text-slate-500 hover:text-slate-300 transition-colors">
                     <X size={18} />
                 </button>
             </div>

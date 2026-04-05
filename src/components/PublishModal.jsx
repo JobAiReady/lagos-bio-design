@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Upload, Loader2, Tag } from 'lucide-react';
 import { publishDesign } from '../lib/gallery';
 import { sanitizeText, sanitizeDescription, sanitizeTags } from '../utils/sanitize';
+import { useModalA11y } from '../hooks/useModalA11y';
 
 const PublishModal = ({ isOpen, onClose, runData, user, onPublishSuccess }) => {
     const [title, setTitle] = useState('');
@@ -9,6 +10,8 @@ const PublishModal = ({ isOpen, onClose, runData, user, onPublishSuccess }) => {
     const [tags, setTags] = useState('');
     const [isPublishing, setIsPublishing] = useState(false);
     const [error, setError] = useState(null);
+
+    const modalRef = useModalA11y(isOpen, onClose);
 
     if (!isOpen) return null;
 
@@ -59,7 +62,7 @@ const PublishModal = ({ isOpen, onClose, runData, user, onPublishSuccess }) => {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-            <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
+            <div ref={modalRef} role="dialog" aria-modal="true" aria-label="Publish to Gallery" tabIndex={-1} className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl outline-none">
 
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-slate-800 bg-slate-950/50">
@@ -67,7 +70,7 @@ const PublishModal = ({ isOpen, onClose, runData, user, onPublishSuccess }) => {
                         <Upload className="w-5 h-5 text-emerald-500" />
                         Publish to Gallery
                     </h2>
-                    <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors">
+                    <button onClick={onClose} aria-label="Close" className="text-slate-400 hover:text-white transition-colors">
                         <X size={20} />
                     </button>
                 </div>

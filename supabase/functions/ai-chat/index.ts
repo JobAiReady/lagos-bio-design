@@ -1,9 +1,8 @@
-import "https://deno.land/x/xhr@0.3.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
+const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
 
 const ALLOWED_ORIGINS = [
   "https://bootcamp.jobaiready.ai",
@@ -94,9 +93,9 @@ serve(async (req) => {
       );
     }
 
-    if (!GEMINI_API_KEY) {
+    if (!ANTHROPIC_API_KEY) {
       return new Response(
-        JSON.stringify({ error: "GEMINI_API_KEY not configured" }),
+        JSON.stringify({ error: "ANTHROPIC_API_KEY not configured" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -120,31 +119,34 @@ INSTRUCTIONS:
 - If the student is using GPU-only libraries (torch, esm) in the browser, remind them to use Google Colab.
 - Reference specific pLDDT thresholds, RMSD values, and pipeline steps when relevant.`;
 
-    const response = await fetch(GEMINI_URL, {
+    const response = await fetch(ANTHROPIC_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
+      },
       body: JSON.stringify({
-        contents: [
-          { role: "user", parts: [{ text: systemPrompt + "\n\nStudent question: " + message }] },
+        model: "claude-haiku-4-5-20251001",
+        max_tokens: 512,
+        system: systemPrompt,
+        messages: [
+          { role: "user", content: message },
         ],
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 512,
-        },
       }),
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      console.error("Gemini API error:", data);
+      console.error("Claude API error:", data);
       return new Response(
         JSON.stringify({ error: "LLM API error", details: data?.error?.message }),
         { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I couldn't generate a response.";
+    const text = data?.content?.[0]?.text || "Sorry, I couldn't generate a response.";
 
     return new Response(
       JSON.stringify({ response: text }),

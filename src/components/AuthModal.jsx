@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { X, Mail, Lock, Loader2, AlertCircle, Key } from 'lucide-react';
-
 import { sanitizeEmail } from '../utils/sanitize';
+import { useModalA11y } from '../hooks/useModalA11y';
 
 const AuthModal = ({ isOpen, onClose, initialMode = 'signin' }) => {
     const [isSignUp, setIsSignUp] = useState(initialMode === 'signup');
@@ -14,17 +14,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'signin' }) => {
         }
     }, [isOpen, initialMode]);
 
-    // Lock body scroll when modal is open
-    React.useEffect(() => {
-        if (isOpen) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = 'unset';
-        }
-        return () => {
-            document.body.style.overflow = 'unset';
-        };
-    }, [isOpen]);
+    const modalRef = useModalA11y(isOpen, onClose);
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -68,25 +58,26 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'signin' }) => {
                 throw new Error('Please enter a valid email address');
             }
             if (isSignUp) {
-                // Verify Access Code Securely via RPC
-                const { data: isValid, error: rpcError } = await supabase.rpc('verify_cohort_code', {
-                    code: accessCode
-                });
-
-                if (rpcError) {
-                    console.error('RPC Error:', rpcError);
-                    throw new Error('Failed to verify access code. Please try again.');
+                // Atomic server-side verification + signup via Edge Function
+                const res = await fetch(
+                    `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/signup`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+                        },
+                        body: JSON.stringify({
+                            email: sanitizedEmail,
+                            password,
+                            accessCode,
+                        }),
+                    }
+                );
+                const result = await res.json();
+                if (!res.ok) {
+                    throw new Error(result.error || 'Signup failed. Please try again.');
                 }
-
-                if (!isValid) {
-                    throw new Error('Invalid Access Code. Please contact the administrator.');
-                }
-
-                const { error } = await supabase.auth.signUp({
-                    email: sanitizedEmail,
-                    password,
-                });
-                if (error) throw error;
                 setShowSuccess(true);
             } else {
                 const { error } = await supabase.auth.signInWithPassword({
@@ -226,7 +217,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'signin' }) => {
     return (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm">
             <div className="flex min-h-full items-center justify-center p-4">
-                <div role="dialog" aria-modal="true" aria-labelledby="auth-modal-title" className="bg-slate-900 border border-slate-800 rounded-xl shadow-2xl w-full max-w-md animate-in fade-in zoom-in duration-200">
+                <div ref={modalRef} role="dialog" aria-modal="true" aria-labelledby="auth-modal-title" tabIndex={-1} className="bg-slate-900 border border-slate-800 rounded-xl shadow-2xl w-full max-w-md animate-in fade-in zoom-in duration-200 outline-none">
                     <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-950/50">
                         <h2 id="auth-modal-title" className="text-xl font-bold text-slate-100">
                             {isSignUp ? 'Create Account' : 'Welcome Back'}
