@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Bot, X, Sparkles, Terminal, FileCode } from 'lucide-react';
+import Markdown from 'react-markdown';
 import { useAiBrain } from '../hooks/useAiBrain';
 
 const AiAssistant = ({ isOpen, onClose, context }) => {
@@ -68,7 +69,25 @@ const AiAssistant = ({ isOpen, onClose, context }) => {
                                     : 'bg-slate-800 text-slate-200 rounded-bl-none border border-slate-700'
                                 }`}
                         >
-                            {msg.text}
+                            {msg.role === 'assistant' ? (
+                                <Markdown
+                                    components={{
+                                        h2: ({ children }) => <h2 className="text-base font-bold text-emerald-400 mt-3 mb-1">{children}</h2>,
+                                        h3: ({ children }) => <h3 className="text-sm font-semibold text-emerald-300 mt-2 mb-1">{children}</h3>,
+                                        p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                                        ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-0.5">{children}</ul>,
+                                        ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-0.5">{children}</ol>,
+                                        li: ({ children }) => <li className="text-slate-300">{children}</li>,
+                                        strong: ({ children }) => <strong className="text-emerald-400 font-semibold">{children}</strong>,
+                                        code: ({ children, className }) => className
+                                            ? <code className="block bg-slate-950 rounded-lg p-2 my-2 text-xs text-emerald-300 overflow-x-auto">{children}</code>
+                                            : <code className="bg-slate-800 px-1 py-0.5 rounded text-xs text-emerald-300">{children}</code>,
+                                        hr: () => <hr className="border-slate-700 my-2" />,
+                                    }}
+                                >
+                                    {msg.text}
+                                </Markdown>
+                            ) : msg.text}
                         </div>
                     </div>
                 ))}
