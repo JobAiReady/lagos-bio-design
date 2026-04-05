@@ -1,10 +1,12 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { HeuristicBrain } from '../lib/ai/HeuristicBrain';
 import { LlmBrain } from '../lib/ai/LlmBrain';
 
 // The "Socket" that connects the UI to the Intelligence Provider
-// Tries LlmBrain (Claude) first, falls back to HeuristicBrain on failure
-export const useAiBrain = () => {
+// Pro users get LlmBrain (Claude), free users get HeuristicBrain
+// LlmBrain also falls back to HeuristicBrain on failure
+export const useAiBrain = (userPlan = 'free') => {
+    const isPro = userPlan === 'pro';
     const [messages, setMessages] = useState(() => [
         {
             id: 'init',
@@ -14,8 +16,16 @@ export const useAiBrain = () => {
         }
     ]);
     const [isThinking, setIsThinking] = useState(false);
-    const [activeBrainName, setActiveBrainName] = useState(LlmBrain.name);
-    const llmAvailable = useRef(true);
+    const [activeBrainName, setActiveBrainName] = useState(
+        isPro ? LlmBrain.name : HeuristicBrain.name
+    );
+    const llmAvailable = useRef(isPro);
+
+    // Sync when plan changes (e.g. upgrade mid-session)
+    useEffect(() => {
+        llmAvailable.current = isPro;
+        setActiveBrainName(isPro ? LlmBrain.name : HeuristicBrain.name); // eslint-disable-line react-hooks/set-state-in-effect -- intentional sync on plan change
+    }, [isPro]);
 
     const sendMessage = useCallback(async (userText, context) => {
         // 1. Add User Message
@@ -31,7 +41,7 @@ export const useAiBrain = () => {
         try {
             let response;
 
-            // Try LlmBrain if still available
+            // Try LlmBrain if still available (pro plan)
             if (llmAvailable.current) {
                 try {
                     response = await LlmBrain.process({ message: userText, context });
@@ -82,6 +92,7 @@ export const useAiBrain = () => {
         messages,
         sendMessage,
         isThinking,
-        brainName: activeBrainName
+        brainName: activeBrainName,
+        isPro
     };
 };

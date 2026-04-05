@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Menu, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
 import ErrorBoundary from '../components/ErrorBoundary';
 import WorkspaceTopBar from '../components/WorkspaceTopBar';
 import WorkspaceSidebar from '../components/WorkspaceSidebar';
@@ -11,6 +10,7 @@ import PublishModal from '../components/PublishModal';
 import AiAssistant from '../components/AiAssistant';
 import CodeEditor from '../components/CodeEditor';
 import { usePyodide } from '../hooks/usePyodide';
+import { useAuth } from '../contexts/useAuth';
 
 const DEFAULT_FILES = [
     { name: 'script.py', type: 'python', content: '# Protein Design Lab - Intro Script\nimport numpy as np\n\n# Generate a random protein-like sequence\namino_acids = list("ACDEFGHIKLMNPQRSTVWY")\nseq_length = 50\nsequence = "".join(np.random.choice(amino_acids, seq_length))\n\nprint(f"Generated sequence ({seq_length} residues):")\nprint(sequence)\nprint(f"\\nMolecular weight estimate: {seq_length * 110:.0f} Da")\nprint("\\nNote: For GPU-heavy tools (AlphaFold, RFDiffusion),")\nprint("use the Open in Colab button in the Lab view.")' },
@@ -26,20 +26,14 @@ const WorkspaceContent = () => {
     const [isMobile, setIsMobile] = useState(false);
     const [isPublishOpen, setIsPublishOpen] = useState(false);
     const [isAiOpen, setIsAiOpen] = useState(false);
-    const [user, setUser] = useState(null);
+    const { user, profile } = useAuth();
 
     const { isPythonReady, isRunning, stage, error, output, appendOutput, retry, runScript } = usePyodide();
 
-    // Check Auth
+    // Redirect if not authenticated
     useEffect(() => {
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            if (!session) {
-                navigate('/');
-            } else {
-                setUser(session.user);
-            }
-        });
-    }, [navigate]);
+        if (!user) navigate('/');
+    }, [user, navigate]);
 
     // Handle window resize
     useEffect(() => {
@@ -153,6 +147,7 @@ const WorkspaceContent = () => {
                 isOpen={isAiOpen}
                 onClose={() => setIsAiOpen(false)}
                 context={{ activeFile, code: activeFileContent, logs: output }}
+                userPlan={profile?.plan || 'free'}
             />
         </div>
     );

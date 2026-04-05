@@ -41,9 +41,16 @@ describe('useAiBrain', () => {
         expect(result.current.messages[0].text).toContain('System Online');
     });
 
-    it('starts with LlmBrain name', () => {
-        const { result } = renderHook(() => useAiBrain());
+    it('starts with HeuristicBrain name on free plan', () => {
+        const { result } = renderHook(() => useAiBrain('free'));
+        expect(result.current.brainName).toBe('Lab Assistant (Basic)');
+        expect(result.current.isPro).toBe(false);
+    });
+
+    it('starts with LlmBrain name on pro plan', () => {
+        const { result } = renderHook(() => useAiBrain('pro'));
         expect(result.current.brainName).toBe('Lab Assistant (Claude)');
+        expect(result.current.isPro).toBe(true);
     });
 
     it('starts not thinking', () => {
@@ -51,10 +58,10 @@ describe('useAiBrain', () => {
         expect(result.current.isThinking).toBe(false);
     });
 
-    it('uses LlmBrain when available', async () => {
+    it('uses LlmBrain for pro users', async () => {
         LlmBrain.process.mockResolvedValueOnce({ text: 'Claude response', actions: [] });
 
-        const { result } = renderHook(() => useAiBrain());
+        const { result } = renderHook(() => useAiBrain('pro'));
 
         await act(async () => {
             result.current.sendMessage('Hello', context);
@@ -74,7 +81,7 @@ describe('useAiBrain', () => {
         LlmBrain.process.mockRejectedValueOnce(new Error('Edge Function not deployed'));
         HeuristicBrain.process.mockResolvedValueOnce({ text: 'Heuristic fallback', actions: [] });
 
-        const { result } = renderHook(() => useAiBrain());
+        const { result } = renderHook(() => useAiBrain('pro'));
 
         await act(async () => {
             result.current.sendMessage('Help me', context);
@@ -97,7 +104,7 @@ describe('useAiBrain', () => {
         LlmBrain.process.mockRejectedValueOnce(new Error('Not deployed'));
         HeuristicBrain.process.mockResolvedValueOnce({ text: 'Fallback 1', actions: [] });
 
-        const { result } = renderHook(() => useAiBrain());
+        const { result } = renderHook(() => useAiBrain('pro'));
 
         await act(async () => {
             result.current.sendMessage('First', context);
@@ -117,10 +124,25 @@ describe('useAiBrain', () => {
         expect(result.current.brainName).toBe('Lab Assistant (Basic)');
     });
 
+    it('uses HeuristicBrain for free users without trying LlmBrain', async () => {
+        HeuristicBrain.process.mockResolvedValueOnce({ text: 'Basic response', actions: [] });
+
+        const { result } = renderHook(() => useAiBrain('free'));
+
+        await act(async () => {
+            result.current.sendMessage('Hello', context);
+        });
+        act(() => { vi.advanceTimersByTime(800); });
+
+        expect(LlmBrain.process).not.toHaveBeenCalled();
+        expect(HeuristicBrain.process).toHaveBeenCalled();
+        expect(result.current.messages[2].text).toBe('Basic response');
+    });
+
     it('adds user message immediately on sendMessage', async () => {
         LlmBrain.process.mockResolvedValueOnce({ text: 'ok', actions: [] });
 
-        const { result } = renderHook(() => useAiBrain());
+        const { result } = renderHook(() => useAiBrain('pro'));
 
         act(() => {
             result.current.sendMessage('Hello', context);
@@ -136,7 +158,7 @@ describe('useAiBrain', () => {
         LlmBrain.process.mockRejectedValueOnce(new Error('LLM down'));
         HeuristicBrain.process.mockRejectedValueOnce(new Error('Heuristic crash'));
 
-        const { result } = renderHook(() => useAiBrain());
+        const { result } = renderHook(() => useAiBrain('pro'));
 
         await act(async () => {
             result.current.sendMessage('Break!', context);

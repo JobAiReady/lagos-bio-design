@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Dna, BookOpen, Cpu, ShieldAlert, Globe2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Dna, BookOpen, Cpu, ShieldAlert, Globe2, BarChart3 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
 import JobAiReadyHeader from '../components/JobAiReadyHeader';
 import AuthModal from '../components/AuthModal';
 import LabDetail from '../components/LabDetail';
@@ -9,31 +8,24 @@ import LessonPanel from '../components/LessonPanel';
 import CourseModule from '../components/CourseModule';
 import HeroSection from '../components/HeroSection';
 import BootcampFooter from '../components/BootcampFooter';
+import CertificateButton from '../components/CertificateButton';
+import PricingSection from '../components/PricingSection';
 import { modules as modulesData } from '../data/modules.jsx';
 import { useModuleProgress } from '../hooks/useModuleProgress';
+import { useCertificate } from '../hooks/useCertificate';
+import { useAuth } from '../contexts/useAuth';
 
 export default function LagosBioBootcamp() {
     const [openModule, setOpenModule] = useState(0);
     const [activeTab, setActiveTab] = useState('curriculum');
     const [selectedLab, setSelectedLab] = useState(null);
     const [selectedLesson, setSelectedLesson] = useState(null);
-    const [user, setUser] = useState(null);
     const [isAuthOpen, setIsAuthOpen] = useState(false);
     const navigate = useNavigate();
-
-    useEffect(() => {
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            setUser(session?.user ?? null);
-        });
-
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            setUser(session?.user ?? null);
-        });
-
-        return () => subscription.unsubscribe();
-    }, []);
+    const { user, profile } = useAuth();
 
     const moduleProgress = useModuleProgress(modulesData, user, selectedLab);
+    const { isEligible, isGenerating, generateCertificate } = useCertificate(moduleProgress, modulesData, profile);
 
     return (
         <div className="min-h-screen bg-slate-950 font-sans text-slate-200 selection:bg-emerald-500/30">
@@ -65,6 +57,15 @@ export default function LagosBioBootcamp() {
                             >
                                 Mission
                             </button>
+                            {user && (
+                                <button
+                                    onClick={() => navigate('/dashboard')}
+                                    className="text-sm font-medium text-slate-400 hover:text-white transition-colors flex items-center gap-1"
+                                >
+                                    <BarChart3 size={14} />
+                                    My Progress
+                                </button>
+                            )}
                             <button
                                 onClick={() => user ? navigate('/workspace') : setIsAuthOpen(true)}
                                 className="bg-white text-slate-900 px-4 py-2 rounded-md text-sm font-bold hover:bg-slate-200 transition-colors shadow-lg shadow-white/5"
@@ -77,6 +78,8 @@ export default function LagosBioBootcamp() {
             </nav>
 
             <HeroSection />
+
+            <PricingSection onApply={() => setIsAuthOpen(true)} />
 
             {/* Main Content Area */}
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -107,6 +110,13 @@ export default function LagosBioBootcamp() {
 
                         {/* Sidebar */}
                         <div className="lg:col-span-1 space-y-8">
+                            {user && isEligible && (
+                                <CertificateButton
+                                    isEligible={isEligible}
+                                    isGenerating={isGenerating}
+                                    onGenerate={generateCertificate}
+                                />
+                            )}
                             <div className="bg-slate-900 p-6 rounded-xl border border-slate-800 sticky top-24">
                                 <h4 className="font-bold text-white mb-4">Why This Matters</h4>
                                 <p className="text-slate-400 text-sm mb-6 leading-relaxed">

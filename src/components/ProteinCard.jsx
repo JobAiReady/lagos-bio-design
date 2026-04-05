@@ -1,8 +1,8 @@
 import React from 'react';
-import { User, Box, Tag } from 'lucide-react';
+import { User, Box, Tag, Heart, Star } from 'lucide-react';
 
-const ProteinCard = ({ design }) => {
-    const { title, description: _description, tags, profiles, thumbnail_url, created_at } = design;
+const ProteinCard = ({ design, likeCount = 0, isLiked = false, onToggleLike }) => {
+    const { title, description: _description, tags, profiles, thumbnail_url, created_at, featured } = design;
 
     return (
         <div className="bg-slate-900/50 border border-slate-700/50 rounded-xl overflow-hidden hover:border-emerald-500/50 transition-all group">
@@ -23,6 +23,29 @@ const ProteinCard = ({ design }) => {
 
                 {/* Overlay Gradient */}
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent opacity-60" />
+
+                {/* Featured Badge */}
+                {featured && (
+                    <div className="absolute top-3 left-3 flex items-center gap-1 bg-yellow-500/90 text-slate-900 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full">
+                        <Star size={10} />
+                        Featured
+                    </div>
+                )}
+
+                {/* Like Button */}
+                {onToggleLike && (
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onToggleLike(design.id); }}
+                        className="absolute top-3 right-3 flex items-center gap-1 bg-slate-900/80 backdrop-blur-sm px-2 py-1 rounded-full text-xs transition-colors hover:bg-slate-800"
+                        aria-label={isLiked ? 'Unlike' : 'Like'}
+                    >
+                        <Heart
+                            size={14}
+                            className={isLiked ? 'text-red-500 fill-red-500' : 'text-slate-400'}
+                        />
+                        <span className={isLiked ? 'text-red-400' : 'text-slate-400'}>{likeCount}</span>
+                    </button>
+                )}
             </div>
 
             {/* Content */}

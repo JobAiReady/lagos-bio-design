@@ -73,6 +73,20 @@ serve(async (req) => {
       );
     }
 
+    // Link user to cohort
+    const { data: cohort } = await supabaseAdmin
+      .from("cohorts")
+      .select("id")
+      .eq("access_code", accessCode)
+      .single();
+
+    if (cohort && data.user) {
+      await supabaseAdmin
+        .from("profiles")
+        .update({ cohort_id: cohort.id })
+        .eq("id", data.user.id);
+    }
+
     return new Response(
       JSON.stringify({ user: data.user }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }

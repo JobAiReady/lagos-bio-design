@@ -2,7 +2,12 @@
   "permissions": {
     "allow": [
       "Bash(npm test:*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(grep -r \"table\\\\|CREATE\\\\|INSERT\" /c/dev/LBD/supabase/migrations/*.sql)",
+      "Bash(find:*)",
+      "Bash(npx vitest:*)",
+      "Bash(npx eslint:*)",
+      "Bash(npx vite:*)"
     ]
   }
 }

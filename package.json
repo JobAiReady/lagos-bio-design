@@ -22,6 +22,7 @@
     "@codemirror/view": "^6.41.0",
     "@supabase/supabase-js": "^2.84.0",
     "codemirror": "^6.0.2",
+    "jspdf": "^4.2.1",
     "lucide-react": "^0.554.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",

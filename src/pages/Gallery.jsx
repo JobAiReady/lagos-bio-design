@@ -1,27 +1,41 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import JobAiReadyHeader from '../components/JobAiReadyHeader';
 import ProteinCard from '../components/ProteinCard';
-import { fetchGallery } from '../lib/gallery';
+import { fetchGallery, fetchLikeCounts, fetchUserLikes, toggleLike } from '../lib/gallery';
+import { useAuth } from '../contexts/useAuth';
 import { Loader2, Search } from 'lucide-react';
 
 const Gallery = () => {
+    const { user } = useAuth();
     const [designs, setDesigns] = useState([]);
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(false);
+    const [likeCounts, setLikeCounts] = useState({});
+    const [userLikes, setUserLikes] = useState(new Set());
     const searchRef = useRef(search);
 
     const loadGallery = useCallback(async (pageNum, searchTerm, append = false) => {
         try {
             const result = await fetchGallery({ page: pageNum, search: searchTerm });
-            setDesigns(prev => append ? [...prev, ...result.data] : result.data);
+            const newDesigns = append ? [...designs, ...result.data] : result.data;
+            setDesigns(newDesigns);
             setHasMore(result.hasMore);
+
+            // Fetch like data
+            const ids = newDesigns.map(d => d.id);
+            const [counts, likes] = await Promise.all([
+                fetchLikeCounts(ids),
+                fetchUserLikes(user?.id),
+            ]);
+            setLikeCounts(counts);
+            setUserLikes(likes);
         } catch (error) {
             console.error('Error loading gallery:', error);
         }
-    }, []);
+    }, [user, designs]);
 
     useEffect(() => {
         const isNewSearch = searchRef.current !== search;
@@ -37,6 +51,24 @@ const Gallery = () => {
 
         return () => { cancelled = true; clearTimeout(debounce); };
     }, [search, loadGallery]);
+
+    const handleToggleLike = async (designId) => {
+        if (!user) return;
+        try {
+            const liked = await toggleLike(designId, user.id);
+            setUserLikes(prev => {
+                const next = new Set(prev);
+                liked ? next.add(designId) : next.delete(designId);
+                return next;
+            });
+            setLikeCounts(prev => ({
+                ...prev,
+                [designId]: (prev[designId] || 0) + (liked ? 1 : -1),
+            }));
+        } catch (err) {
+            console.error('Like toggle failed:', err);
+        }
+    };
 
     const handleLoadMore = async () => {
         const nextPage = page + 1;
@@ -85,7 +117,13 @@ const Gallery = () => {
                     <>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {designs.map((design) => (
-                                <ProteinCard key={design.id} design={design} />
+                                <ProteinCard
+                                    key={design.id}
+                                    design={design}
+                                    likeCount={likeCounts[design.id] || 0}
+                                    isLiked={userLikes.has(design.id)}
+                                    onToggleLike={user ? handleToggleLike : undefined}
+                                />
                             ))}
                         </div>
                         {hasMore && (

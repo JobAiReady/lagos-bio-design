@@ -67,3 +67,51 @@ export const fetchGallery = async ({ page = 0, search = '' } = {}) => {
     if (error) throw error;
     return { data: data || [], total: count || 0, hasMore: (page + 1) * PAGE_SIZE < (count || 0) };
 };
+
+// Fetch likes for a set of design IDs (returns { designId: count })
+export const fetchLikeCounts = async (designIds) => {
+    if (!designIds.length) return {};
+    const { data, error } = await supabase
+        .from('gallery_likes')
+        .select('design_id')
+        .in('design_id', designIds);
+
+    if (error) throw error;
+
+    const counts = {};
+    (data || []).forEach(row => {
+        counts[row.design_id] = (counts[row.design_id] || 0) + 1;
+    });
+    return counts;
+};
+
+// Fetch which designs the current user has liked
+export const fetchUserLikes = async (userId) => {
+    if (!userId) return new Set();
+    const { data, error } = await supabase
+        .from('gallery_likes')
+        .select('design_id')
+        .eq('user_id', userId);
+
+    if (error) throw error;
+    return new Set((data || []).map(row => row.design_id));
+};
+
+// Toggle like on a design
+export const toggleLike = async (designId, userId) => {
+    // Check if already liked
+    const { data: existing } = await supabase
+        .from('gallery_likes')
+        .select('id')
+        .eq('design_id', designId)
+        .eq('user_id', userId)
+        .single();
+
+    if (existing) {
+        await supabase.from('gallery_likes').delete().eq('id', existing.id);
+        return false; // unliked
+    } else {
+        await supabase.from('gallery_likes').insert([{ design_id: designId, user_id: userId }]);
+        return true; // liked
+    }
+};

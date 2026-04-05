@@ -4,10 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/useAuth';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid } from 'recharts';
 import { Shield, Users, Clock, AlertTriangle, ArrowLeft } from 'lucide-react';
+import CohortManager from '../components/admin/CohortManager';
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
     const { user, loading: authLoading } = useAuth();
+    const [activeTab, setActiveTab] = useState('analytics');
     const [events, setEvents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState({
@@ -93,6 +95,28 @@ const AdminDashboard = () => {
                     </div>
                 </div>
 
+                {/* Tabs */}
+                <div className="flex gap-1 mb-8 bg-slate-900 p-1 rounded-lg border border-slate-800 w-fit">
+                    {['analytics', 'cohorts'].map(tab => (
+                        <button
+                            key={tab}
+                            onClick={() => setActiveTab(tab)}
+                            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors capitalize ${
+                                activeTab === tab
+                                    ? 'bg-emerald-600 text-white'
+                                    : 'text-slate-400 hover:text-white'
+                            }`}
+                        >
+                            {tab}
+                        </button>
+                    ))}
+                </div>
+
+                {activeTab === 'cohorts' ? (
+                    <CohortManager />
+                ) : (
+                <>
+
                 {/* Stats Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <div className="bg-slate-900 p-6 rounded-xl border border-slate-800">
@@ -156,6 +180,8 @@ const AdminDashboard = () => {
                         </div>
                     </div>
                 </div>
+                </>
+                )}
             </div>
         </div>
     );

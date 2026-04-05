@@ -2,9 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, Bot, X, Sparkles, Terminal, FileCode } from 'lucide-react';
 import Markdown from 'react-markdown';
 import { useAiBrain } from '../hooks/useAiBrain';
+import UpgradePrompt from './UpgradePrompt';
 
-const AiAssistant = ({ isOpen, onClose, context }) => {
-    const { messages, sendMessage, isThinking, brainName } = useAiBrain();
+const AiAssistant = ({ isOpen, onClose, context, userPlan = 'free' }) => {
+    const { messages, sendMessage, isThinking, brainName, isPro } = useAiBrain(userPlan);
     const [input, setInput] = useState('');
     const messagesEndRef = useRef(null);
 
@@ -42,6 +43,8 @@ const AiAssistant = ({ isOpen, onClose, context }) => {
                     <X size={18} />
                 </button>
             </div>
+
+            {!isPro && <UpgradePrompt />}
 
             {/* Context Indicator (What is the AI seeing?) */}
             <div className="px-4 py-1.5 bg-slate-950/80 border-b border-slate-800 flex items-center gap-3 text-[10px] text-slate-500 font-mono overflow-hidden">
