@@ -12,11 +12,12 @@ export const AuthProvider = ({ children }) => {
             setProfile(null);
             return;
         }
-        const { data } = await supabase
+        const { data, error } = await supabase
             .from('profiles')
-            .select('full_name, avatar_url, plan')
+            .select('full_name, plan')
             .eq('id', userId)
             .single();
+        if (error) console.warn('[AuthContext] profile fetch failed:', error.message);
         setProfile(data);
     }, []);
 
