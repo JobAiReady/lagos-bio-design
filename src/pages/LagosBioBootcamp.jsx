@@ -81,6 +81,14 @@ export default function LagosBioBootcamp() {
                             >
                                 Mission
                             </button>
+                            {!user && (
+                                <button
+                                    onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
+                                    className="text-sm font-medium text-slate-400 hover:text-white transition-colors"
+                                >
+                                    Pricing
+                                </button>
+                            )}
                             {user && (
                                 <button
                                     onClick={() => navigate('/dashboard')}
@@ -103,7 +111,11 @@ export default function LagosBioBootcamp() {
 
             <HeroSection />
 
-            <PricingSection onApply={() => setIsAuthOpen(true)} />
+            {!user && (
+                <div id="pricing">
+                    <PricingSection onApply={() => setIsAuthOpen(true)} />
+                </div>
+            )}
 
             {/* Main Content Area */}
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
