@@ -6,6 +6,7 @@ const Workspace = lazy(() => import('./pages/Workspace'));
 const Gallery = lazy(() => import('./pages/Gallery'));
 const VerifyCertificate = lazy(() => import('./pages/VerifyCertificate'));
 const StudentDashboard = lazy(() => import('./pages/StudentDashboard'));
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/verify/:code" element={<VerifyCertificate />} />
           <Route path="/dashboard" element={<StudentDashboard />} />
+          <Route path="/admin" element={<AdminDashboard />} />
           <Route path="*" element={
             <div className="h-screen w-full bg-slate-950 flex flex-col items-center justify-center text-center px-4">
               <h1 className="text-6xl font-bold text-emerald-500 mb-4">404</h1>

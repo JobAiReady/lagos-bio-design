@@ -20,12 +20,20 @@ const Gallery = () => {
     const loadGallery = useCallback(async (pageNum, searchTerm, append = false) => {
         try {
             const result = await fetchGallery({ page: pageNum, search: searchTerm });
-            const newDesigns = append ? [...designs, ...result.data] : result.data;
-            setDesigns(newDesigns);
+            let allDesigns;
+            if (append) {
+                setDesigns(prev => {
+                    allDesigns = [...prev, ...result.data];
+                    return allDesigns;
+                });
+            } else {
+                allDesigns = result.data;
+                setDesigns(allDesigns);
+            }
             setHasMore(result.hasMore);
 
             // Fetch like data
-            const ids = newDesigns.map(d => d.id);
+            const ids = (allDesigns || result.data).map(d => d.id);
             const [counts, likes] = await Promise.all([
                 fetchLikeCounts(ids),
                 fetchUserLikes(user?.id),
@@ -35,7 +43,7 @@ const Gallery = () => {
         } catch (error) {
             console.error('Error loading gallery:', error);
         }
-    }, [user, designs]);
+    }, [user]);
 
     useEffect(() => {
         const isNewSearch = searchRef.current !== search;

@@ -29,26 +29,7 @@ export const usePyodide = () => {
     }, [appendOutput]);
 
     useEffect(() => {
-        let cancelled = false;
-        setError(null);
-        setStage(STAGES.DOWNLOADING);
-        appendOutput('> Initializing Python Runtime (Pyodide)...');
-        loadPyodide((s) => { if (!cancelled) setStage(s); })
-            .then(() => {
-                if (!cancelled) {
-                    setIsPythonReady(true);
-                    setStage(null);
-                    appendOutput('> Python 3.11 Ready.', '> Bio-Design Libraries (Simulated) Loaded.');
-                }
-            })
-            .catch((err) => {
-                if (!cancelled) {
-                    setStage(null);
-                    setError(err.message);
-                    appendOutput(`> Error loading Python: ${err.message}`);
-                }
-            });
-        return () => { cancelled = true; };
+        initPython();
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

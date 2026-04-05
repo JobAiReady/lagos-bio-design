@@ -30,7 +30,7 @@ export const useAiBrain = (userPlan = 'free') => {
     const sendMessage = useCallback(async (userText, context) => {
         // 1. Add User Message
         const userMsg = {
-            id: Date.now().toString(),
+            id: crypto.randomUUID(),
             role: 'user',
             text: userText,
             timestamp: Date.now()
@@ -58,7 +58,7 @@ export const useAiBrain = (userPlan = 'free') => {
 
             // 2. Add Assistant Response
             const aiMsg = {
-                id: (Date.now() + 1).toString(),
+                id: crypto.randomUUID(),
                 role: 'assistant',
                 text: response.text,
                 actions: response.actions,
@@ -79,7 +79,7 @@ export const useAiBrain = (userPlan = 'free') => {
         } catch (error) {
             console.error("Brain Failure:", error);
             setMessages(prev => [...prev, {
-                id: Date.now().toString(),
+                id: crypto.randomUUID(),
                 role: 'assistant',
                 text: "I encountered an internal error processing that request.",
                 isError: true

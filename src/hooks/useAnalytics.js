@@ -1,16 +1,16 @@
 import { useCallback, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/useAuth';
 
 export const useAnalytics = () => {
     const location = useLocation();
+    const { user } = useAuth();
 
     const trackEvent = useCallback(async (eventType, metadata = {}) => {
+        if (!user) return; // Don't track unauthenticated users
+
         try {
-            const { data: { user } } = await supabase.auth.getUser();
-
-            if (!user) return; // Don't track unauthenticated users
-
             const { error } = await supabase
                 .from('analytics_events')
                 .insert({
@@ -28,7 +28,7 @@ export const useAnalytics = () => {
         } catch (err) {
             console.warn('Analytics Exception:', err);
         }
-    }, [location.pathname]);
+    }, [user, location.pathname]);
 
     // Auto-track page views
     useEffect(() => {

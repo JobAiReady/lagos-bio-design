@@ -1,15 +1,19 @@
+import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+
+// Mock useAuth to provide user
+const mockUser = { current: null };
+vi.mock('../contexts/useAuth', () => ({
+    useAuth: () => ({ user: mockUser.current, profile: null, loading: false }),
+}));
 
 // Mock supabase
 vi.mock('../lib/supabase', () => {
     const mockInsert = vi.fn().mockResolvedValue({ error: null });
     return {
         supabase: {
-            auth: {
-                getUser: vi.fn(),
-            },
             from: vi.fn(() => ({
                 insert: mockInsert,
             })),
@@ -28,16 +32,14 @@ const wrapper = ({ children }) => (
 describe('useAnalytics', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        mockUser.current = null;
     });
 
     it('auto-tracks page_view on mount for authenticated users', async () => {
-        supabase.auth.getUser.mockResolvedValue({
-            data: { user: { id: 'user-1' } },
-        });
+        mockUser.current = { id: 'user-1' };
 
         renderHook(() => useAnalytics(), { wrapper });
 
-        // Wait for the async trackEvent to complete
         await vi.waitFor(() => {
             expect(supabase.from).toHaveBeenCalledWith('analytics_events');
         });
@@ -49,46 +51,33 @@ describe('useAnalytics', () => {
     });
 
     it('does not track events for unauthenticated users', async () => {
-        supabase.auth.getUser.mockResolvedValue({
-            data: { user: null },
-        });
+        mockUser.current = null;
 
         renderHook(() => useAnalytics(), { wrapper });
 
-        // Give async code time to settle
         await new Promise((r) => setTimeout(r, 50));
-
-        // from() is not called because user is null
         expect(supabase.from).not.toHaveBeenCalled();
     });
 
     it('exposes trackEvent function', () => {
-        supabase.auth.getUser.mockResolvedValue({
-            data: { user: null },
-        });
-
         const { result } = renderHook(() => useAnalytics(), { wrapper });
         expect(typeof result.current.trackEvent).toBe('function');
     });
 
     it('trackEvent includes custom metadata', async () => {
-        supabase.auth.getUser.mockResolvedValue({
-            data: { user: { id: 'user-2' } },
-        });
+        mockUser.current = { id: 'user-2' };
 
         const mockInsert = vi.fn().mockResolvedValue({ error: null });
         supabase.from.mockReturnValue({ insert: mockInsert });
 
         const { result } = renderHook(() => useAnalytics(), { wrapper });
 
-        // Wait for auto page_view to complete
         await vi.waitFor(() => {
             expect(mockInsert).toHaveBeenCalled();
         });
 
         mockInsert.mockClear();
 
-        // Now call trackEvent manually with custom metadata
         await result.current.trackEvent('lab_started', { module: 'AlphaFold' });
 
         expect(mockInsert).toHaveBeenCalledWith({
@@ -102,16 +91,13 @@ describe('useAnalytics', () => {
     });
 
     it('handles analytics errors gracefully without throwing', async () => {
-        supabase.auth.getUser.mockResolvedValue({
-            data: { user: { id: 'user-3' } },
-        });
+        mockUser.current = { id: 'user-3' };
 
         const mockInsert = vi.fn().mockResolvedValue({
             error: { message: 'Insert failed' },
         });
         supabase.from.mockReturnValue({ insert: mockInsert });
 
-        // Should not throw
         renderHook(() => useAnalytics(), { wrapper });
 
         await vi.waitFor(() => {
