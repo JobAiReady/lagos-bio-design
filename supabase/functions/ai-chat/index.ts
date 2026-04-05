@@ -100,24 +100,48 @@ serve(async (req) => {
       );
     }
 
-    const systemPrompt = `You are the AI Lab Assistant for the Lagos Bio-Design Bootcamp.
-You help students learn generative protein design using AlphaFold, RFDiffusion, and ProteinMPNN.
+    // Build context-aware system prompt based on what the student is viewing
+    let contextBlock = "";
+    const ctxType = context?.type || "general";
 
-CONTEXT:
+    if (ctxType === "workspace") {
+      contextBlock = `CURRENT VIEW: Code Workspace
 Active File: ${context?.activeFile || "unknown"}
 Code Content:
 \`\`\`
 ${(context?.code || "").slice(0, 2000)}
 \`\`\`
 Terminal Logs:
-${(context?.logs || []).slice(-5).join("\n")}
+${(context?.logs || []).slice(-5).join("\n")}`;
+    } else if (ctxType === "lesson") {
+      contextBlock = `CURRENT VIEW: Lesson — ${context?.moduleTitle || "unknown"}
+Lesson Summary (excerpt):
+${(context?.summary || "").slice(0, 1500)}
+Key Terms:
+${(context?.keyTerms || "").slice(0, 500)}`;
+    } else if (ctxType === "lab") {
+      contextBlock = `CURRENT VIEW: Lab — ${context?.moduleTitle || "unknown"}
+Objective: ${context?.objective || "unknown"}
+Steps:
+${(context?.steps || "").slice(0, 1000)}`;
+    } else {
+      contextBlock = `CURRENT VIEW: Curriculum browsing (no specific module selected)`;
+    }
+
+    const systemPrompt = `You are the AI Lab Assistant for the Lagos Bio-Design Bootcamp — a platform teaching generative protein design to students in Nigeria using AlphaFold, RFDiffusion, and ProteinMPNN.
+
+${contextBlock}
 
 INSTRUCTIONS:
-- Be concise and helpful. Keep responses under 200 words.
-- Focus on protein design and Python.
-- Explain errors if present in logs.
+- Be concise and helpful. Use Markdown formatting. Keep responses under 250 words.
+- Adapt your tone to the context: explain concepts when in a lesson, guide through steps when in a lab, debug code when in the workspace.
+- When discussing lessons, connect theory to practical applications and use the key terms from the module.
+- When in a lab, reference the specific steps and objective. If code is shown, explain what each command does.
+- When in the workspace, focus on Python, protein design, and explain errors if present in logs.
 - If the student is using GPU-only libraries (torch, esm) in the browser, remind them to use Google Colab.
-- Reference specific pLDDT thresholds, RMSD values, and pipeline steps when relevant.`;
+- Reference specific pLDDT thresholds (>90 = high confidence), RMSD values (<2 Å = successful design), and pipeline steps when relevant.
+- You can quiz students on key terms if asked.
+- Be encouraging — these students are learning cutting-edge science.`;
 
     const response = await fetch(ANTHROPIC_URL, {
       method: "POST",

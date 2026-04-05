@@ -154,7 +154,7 @@ const WorkspaceContent = () => {
             <AiAssistant
                 isOpen={isAiOpen}
                 onClose={() => setIsAiOpen(false)}
-                context={{ activeFile, code: activeFileContent, logs: output }}
+                context={{ type: 'workspace', activeFile, code: activeFileContent, logs: output }}
                 userPlan={profile?.plan || 'free'}
             />
         </div>

@@ -16,11 +16,7 @@ export const LlmBrain = {
         const { data, error } = await supabase.functions.invoke('ai-chat', {
             body: {
                 message,
-                context: {
-                    activeFile: context.activeFile,
-                    code: context.code,
-                    logs: context.logs,
-                },
+                context,
             },
         });
 

@@ -27,19 +27,16 @@ describe('LlmBrain', () => {
             error: null,
         });
 
+        const ctx = { type: 'workspace', code: 'print("hi")', logs: ['output'], activeFile: 'test.py' };
         const result = await LlmBrain.process({
             message: 'Help me',
-            context: { code: 'print("hi")', logs: ['output'], activeFile: 'test.py' },
+            context: ctx,
         });
 
         expect(supabase.functions.invoke).toHaveBeenCalledWith('ai-chat', {
             body: {
                 message: 'Help me',
-                context: {
-                    activeFile: 'test.py',
-                    code: 'print("hi")',
-                    logs: ['output'],
-                },
+                context: ctx,
             },
         });
         expect(result).toEqual({ text: 'Claude says hello', actions: [] });

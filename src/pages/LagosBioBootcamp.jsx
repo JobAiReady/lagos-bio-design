@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Dna, BookOpen, Cpu, ShieldAlert, Globe2, BarChart3 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import JobAiReadyHeader from '../components/JobAiReadyHeader';
@@ -10,6 +10,8 @@ import HeroSection from '../components/HeroSection';
 import BootcampFooter from '../components/BootcampFooter';
 import CertificateButton from '../components/CertificateButton';
 import PricingSection from '../components/PricingSection';
+import AiAssistant from '../components/AiAssistant';
+import AiFloatingButton from '../components/AiFloatingButton';
 import { modules as modulesData } from '../data/modules.jsx';
 import { useModuleProgress } from '../hooks/useModuleProgress';
 import { useCertificate } from '../hooks/useCertificate';
@@ -21,8 +23,30 @@ export default function LagosBioBootcamp() {
     const [selectedLab, setSelectedLab] = useState(null);
     const [selectedLesson, setSelectedLesson] = useState(null);
     const [isAuthOpen, setIsAuthOpen] = useState(false);
+    const [isAiOpen, setIsAiOpen] = useState(false);
     const navigate = useNavigate();
     const { user, profile } = useAuth();
+
+    // Build AI context based on what the student is currently viewing
+    const aiContext = useMemo(() => {
+        if (selectedLesson) {
+            return {
+                type: 'lesson',
+                moduleTitle: selectedLesson.title,
+                summary: selectedLesson.lessonContent?.summary || '',
+                keyTerms: selectedLesson.lessonContent?.keyTerms?.map(t => `${t.term}: ${t.definition}`).join('\n') || '',
+            };
+        }
+        if (selectedLab) {
+            return {
+                type: 'lab',
+                moduleTitle: selectedLab.title,
+                objective: selectedLab.labContent?.objective || '',
+                steps: selectedLab.labContent?.steps?.map(s => `${s.title}: ${s.description}`).join('\n') || '',
+            };
+        }
+        return { type: 'curriculum' };
+    }, [selectedLesson, selectedLab]);
 
     const moduleProgress = useModuleProgress(modulesData, user, selectedLab);
     const { isEligible, isGenerating, generateCertificate } = useCertificate(moduleProgress, modulesData, profile);
@@ -165,6 +189,14 @@ export default function LagosBioBootcamp() {
                 onOpenLab={() => { setSelectedLesson(null); setSelectedLab(selectedLesson); }}
             />
             <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
+
+            <AiAssistant
+                isOpen={isAiOpen}
+                onClose={() => setIsAiOpen(false)}
+                context={aiContext}
+                userPlan={profile?.plan || 'free'}
+            />
+            <AiFloatingButton isOpen={isAiOpen} onClick={() => setIsAiOpen(!isAiOpen)} />
         </div>
     );
 }

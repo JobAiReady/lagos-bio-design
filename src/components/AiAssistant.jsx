@@ -1,13 +1,60 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Bot, X, Sparkles, Terminal, FileCode } from 'lucide-react';
+import { Send, Bot, X, FileCode, Terminal, BookOpen, FlaskConical, Lightbulb } from 'lucide-react';
 import Markdown from 'react-markdown';
 import { useAiBrain } from '../hooks/useAiBrain';
 import UpgradePrompt from './UpgradePrompt';
 
-const AiAssistant = ({ isOpen, onClose, context, userPlan = 'free' }) => {
+/**
+ * Build suggested prompts based on context type.
+ */
+const getSuggestedPrompts = (context) => {
+    if (!context) return [];
+
+    if (context.type === 'lesson') {
+        return [
+            `Explain the key concepts in "${context.moduleTitle}" in simple terms`,
+            `Quiz me on the key terms from this module`,
+            `How does this module connect to real-world biotech in Africa?`,
+        ];
+    }
+    if (context.type === 'lab') {
+        return [
+            `Walk me through the objective of this lab step by step`,
+            `What should I expect as output from this lab?`,
+            `Explain the code in this lab — what does each command do?`,
+        ];
+    }
+    if (context.type === 'workspace') {
+        return [
+            `Explain what this code does`,
+            `How can I improve this script?`,
+            `What proteins could I analyze with this approach?`,
+        ];
+    }
+    // General / curriculum browsing
+    return [
+        `What will I learn in this bootcamp?`,
+        `Explain protein design to a complete beginner`,
+        `What is AlphaFold and why does it matter?`,
+    ];
+};
+
+/**
+ * Build a context summary string for the AI based on what's active.
+ */
+const getContextLabel = (context) => {
+    if (!context) return null;
+    if (context.type === 'lesson') return { icon: BookOpen, label: context.moduleTitle };
+    if (context.type === 'lab') return { icon: FlaskConical, label: context.moduleTitle };
+    if (context.type === 'workspace') return { icon: FileCode, label: context.activeFile };
+    return null;
+};
+
+const AiAssistant = ({ isOpen, onClose, context = {}, userPlan = 'free' }) => {
     const { messages, sendMessage, isThinking, brainName, isPro } = useAiBrain(userPlan);
     const [input, setInput] = useState('');
     const messagesEndRef = useRef(null);
+    const hasUserMessaged = messages.length > 1;
 
     // Auto-scroll to bottom
     useEffect(() => {
@@ -21,10 +68,17 @@ const AiAssistant = ({ isOpen, onClose, context, userPlan = 'free' }) => {
         setInput('');
     };
 
+    const handleSuggestion = (prompt) => {
+        sendMessage(prompt, context);
+    };
+
     if (!isOpen) return null;
 
+    const contextInfo = getContextLabel(context);
+    const suggestions = getSuggestedPrompts(context);
+
     return (
-        <div className="absolute right-4 bottom-20 w-80 md:w-96 h-[500px] bg-slate-900/95 backdrop-blur-xl border border-emerald-500/30 rounded-2xl shadow-2xl flex flex-col z-50 overflow-hidden ring-1 ring-emerald-500/20">
+        <div className="fixed right-4 bottom-20 w-80 md:w-96 h-[500px] bg-slate-900/95 backdrop-blur-xl border border-emerald-500/30 rounded-2xl shadow-2xl flex flex-col z-[60] overflow-hidden ring-1 ring-emerald-500/20">
             {/* Header */}
             <div className="p-4 border-b border-slate-800 bg-slate-950/50 flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -46,18 +100,22 @@ const AiAssistant = ({ isOpen, onClose, context, userPlan = 'free' }) => {
 
             {!isPro && <UpgradePrompt />}
 
-            {/* Context Indicator (What is the AI seeing?) */}
-            <div className="px-4 py-1.5 bg-slate-950/80 border-b border-slate-800 flex items-center gap-3 text-[10px] text-slate-500 font-mono overflow-hidden">
-                <span className="flex items-center gap-1 shrink-0">
-                    <FileCode size={10} />
-                    {context.activeFile}
-                </span>
-                <span className="w-px h-3 bg-slate-800"></span>
-                <span className="flex items-center gap-1 shrink-0">
-                    <Terminal size={10} />
-                    {context.logs.length} logs
-                </span>
-            </div>
+            {/* Context Indicator */}
+            {contextInfo && (
+                <div className="px-4 py-1.5 bg-slate-950/80 border-b border-slate-800 flex items-center gap-2 text-[10px] text-slate-500 font-mono overflow-hidden">
+                    <contextInfo.icon size={10} className="shrink-0" />
+                    <span className="truncate">{contextInfo.label}</span>
+                    {context.type === 'workspace' && context.logs && (
+                        <>
+                            <span className="w-px h-3 bg-slate-800"></span>
+                            <span className="flex items-center gap-1 shrink-0">
+                                <Terminal size={10} />
+                                {context.logs.length} logs
+                            </span>
+                        </>
+                    )}
+                </div>
+            )}
 
             {/* Messages Area */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-900/50">
@@ -95,6 +153,25 @@ const AiAssistant = ({ isOpen, onClose, context, userPlan = 'free' }) => {
                     </div>
                 ))}
 
+                {/* Suggested Prompts — show before user sends first message */}
+                {!hasUserMessaged && !isThinking && suggestions.length > 0 && (
+                    <div className="space-y-2 pt-2">
+                        <div className="flex items-center gap-1.5 text-[10px] text-slate-500 uppercase tracking-wider font-medium">
+                            <Lightbulb size={10} />
+                            Try asking
+                        </div>
+                        {suggestions.map((prompt, idx) => (
+                            <button
+                                key={idx}
+                                onClick={() => handleSuggestion(prompt)}
+                                className="w-full text-left text-xs px-3 py-2 bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 hover:border-emerald-500/30 rounded-lg text-slate-400 hover:text-slate-200 transition-all"
+                            >
+                                {prompt}
+                            </button>
+                        ))}
+                    </div>
+                )}
+
                 {isThinking && (
                     <div className="flex justify-start">
                         <div className="bg-slate-800 rounded-2xl rounded-bl-none px-4 py-3 border border-slate-700 flex items-center gap-1">
@@ -114,7 +191,7 @@ const AiAssistant = ({ isOpen, onClose, context, userPlan = 'free' }) => {
                         type="text"
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
-                        placeholder="Ask about your code..."
+                        placeholder={context.type === 'lesson' ? 'Ask about this lesson...' : context.type === 'lab' ? 'Ask about this lab...' : 'Ask anything about biodesign...'}
                         className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-4 pr-10 py-3 text-sm text-slate-200 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all placeholder:text-slate-600"
                     />
                     <button
