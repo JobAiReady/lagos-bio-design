@@ -25,11 +25,23 @@ export const LlmBrain = {
         });
 
         if (error) {
+            console.error('[LlmBrain] invoke error:', error);
             throw new Error(error.message || 'Edge Function call failed');
         }
 
+        // Edge function returned a JSON error (non-2xx wrapped by Supabase)
+        if (data?.error) {
+            console.error('[LlmBrain] API error:', data.error, data.details);
+            throw new Error(data.details || data.error);
+        }
+
+        if (!data?.response) {
+            console.error('[LlmBrain] unexpected response shape:', data);
+            throw new Error('No response field in edge function reply');
+        }
+
         return {
-            text: data?.response || 'No response from AI.',
+            text: data.response,
             actions: [],
         };
     },
