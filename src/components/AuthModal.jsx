@@ -114,8 +114,8 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'signin' }) => {
     if (resetSent) {
         return (
             <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm">
-                <div className="flex min-h-full items-center justify-center p-4">
-                    <div className="bg-slate-900 border border-slate-800 rounded-xl shadow-2xl w-full max-w-md animate-in fade-in zoom-in duration-200 p-8 text-center">
+                <div className="flex min-h-full items-start sm:items-center justify-center p-2 sm:p-4 py-8 sm:py-4">
+                    <div className="bg-slate-900 border border-slate-800 rounded-xl shadow-2xl w-full max-w-md animate-in fade-in zoom-in duration-200 p-6 sm:p-8 text-center">
                         <div className="w-16 h-16 bg-emerald-900/30 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-500/30">
                             <Mail className="text-emerald-500" size={32} />
                         </div>
@@ -138,15 +138,15 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'signin' }) => {
     if (resetMode) {
         return (
             <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm">
-                <div className="flex min-h-full items-center justify-center p-4">
+                <div className="flex min-h-full items-start sm:items-center justify-center p-2 sm:p-4 py-8 sm:py-4">
                     <div className="bg-slate-900 border border-slate-800 rounded-xl shadow-2xl w-full max-w-md animate-in fade-in zoom-in duration-200">
-                        <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-950/50">
+                        <div className="p-4 sm:p-6 border-b border-slate-800 flex justify-between items-center bg-slate-950/50">
                             <h2 className="text-xl font-bold text-slate-100">Reset Password</h2>
                             <button onClick={() => { setResetMode(false); onClose(); }} className="text-slate-400 hover:text-white transition-colors">
                                 <X size={20} />
                             </button>
                         </div>
-                        <form onSubmit={handleResetPassword} className="p-6 space-y-4">
+                        <form onSubmit={handleResetPassword} className="p-4 sm:p-6 space-y-4">
                             {error && (
                                 <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-lg text-sm flex items-center gap-2">
                                     <AlertCircle size={16} />
@@ -194,8 +194,8 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'signin' }) => {
     if (showSuccess) {
         return (
             <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm">
-                <div className="flex min-h-full items-center justify-center p-4">
-                    <div className="bg-slate-900 border border-slate-800 rounded-xl shadow-2xl w-full max-w-md animate-in fade-in zoom-in duration-200 p-8 text-center">
+                <div className="flex min-h-full items-start sm:items-center justify-center p-2 sm:p-4 py-8 sm:py-4">
+                    <div className="bg-slate-900 border border-slate-800 rounded-xl shadow-2xl w-full max-w-md animate-in fade-in zoom-in duration-200 p-6 sm:p-8 text-center">
                         <div className="w-16 h-16 bg-emerald-900/30 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-500/30">
                             <Mail className="text-emerald-500" size={32} />
                         </div>
@@ -233,9 +233,9 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'signin' }) => {
 
     return (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm">
-            <div className="flex min-h-full items-center justify-center p-4">
-                <div ref={modalRef} role="dialog" aria-modal="true" aria-labelledby="auth-modal-title" tabIndex={-1} className="bg-slate-900 border border-slate-800 rounded-xl shadow-2xl w-full max-w-md animate-in fade-in zoom-in duration-200 outline-none">
-                    <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-950/50">
+            <div className="flex min-h-full items-start sm:items-center justify-center p-2 sm:p-4 py-8 sm:py-4">
+                <div ref={modalRef} role="dialog" aria-modal="true" aria-labelledby="auth-modal-title" tabIndex={-1} className="bg-slate-900 border border-slate-800 rounded-xl shadow-2xl w-full max-w-md animate-in fade-in zoom-in duration-200 outline-none my-auto">
+                    <div className="p-4 sm:p-6 border-b border-slate-800 flex justify-between items-center bg-slate-950/50">
                         <h2 id="auth-modal-title" className="text-xl font-bold text-slate-100">
                             {isSignUp ? 'Create Account' : 'Welcome Back'}
                         </h2>
@@ -244,7 +244,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'signin' }) => {
                         </button>
                     </div>
 
-                    <form onSubmit={handleAuth} className="p-6 space-y-4">
+                    <form onSubmit={handleAuth} className="p-4 sm:p-6 space-y-3 sm:space-y-4">
                         {error && (
                             <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-lg text-sm flex items-center gap-2">
                                 <AlertCircle size={16} />
