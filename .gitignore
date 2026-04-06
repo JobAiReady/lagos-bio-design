@@ -44,3 +44,8 @@ CONTEXTUAL_CONVERSATION.md
 PREVIOUS_CONVERSATION.md
 SESSION_SUMMARY.md
 build_log.txt
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
