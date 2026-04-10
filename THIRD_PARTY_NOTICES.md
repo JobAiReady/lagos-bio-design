@@ -43,6 +43,21 @@ This project references, links to, or uses at runtime the following third-party 
 - **License**: MIT
 - **Usage**: Optional installation in Module 1 for AlphaFold inference
 
+### VibeGen (ModeShapeDiffusionDesign)
+- **Authors**: Ni, B. & Buehler, M.J. (Laboratory for Atomistic and Molecular Mechanics, MIT)
+- **Paper**: "VibeGen: Agentic end-to-end de novo protein design for tailored dynamics using a language diffusion model" — *Matter* (2026)
+- **Repository**: https://github.com/lamm-mit/ModeShapeDiffusionDesign
+- **Model Weights**: https://huggingface.co/lamm-mit/VibeGen
+- **License**: Apache-2.0
+- **Usage**: Cloned and executed at runtime in Colab for dynamics-first protein design (Module 3 Bonus Lab)
+
+### OmegaFold
+- **Authors**: Wu, R., Ding, F., Wang, R., et al. (HelixonProtein)
+- **Paper**: "High-resolution de novo structure prediction from primary sequence" — *bioRxiv* (2022)
+- **Repository**: https://github.com/HeliXonProtein/OmegaFold
+- **License**: Apache-2.0
+- **Usage**: Installed at runtime in Colab for single-sequence structure prediction in VibeGen demo (Module 3 Bonus Lab)
+
 ---
 
 ## Protein Structure Data
@@ -90,6 +105,7 @@ Lesson content references the following published works via hyperlinks. No paper
 3. Dauparas et al. (2022). "Robust deep learning-based protein sequence design using ProteinMPNN." *Science* 378, 49–56.
 4. Lin et al. (2023). "Evolutionary-scale prediction of atomic-level protein structure with a language model." *Science* 379, 1123–1130.
 5. Nobel Prize in Chemistry 2024. https://www.nobelprize.org/prizes/chemistry/2024/summary/
+6. Ni, B. & Buehler, M.J. (2026). "VibeGen: Agentic end-to-end de novo protein design for tailored dynamics using a language diffusion model." *Matter*.
 
 ---
 
@@ -102,4 +118,4 @@ All trademarks are used nominatively for educational identification purposes onl
 
 ---
 
-*Last updated: April 2026*
+*Last updated: April 10, 2026*

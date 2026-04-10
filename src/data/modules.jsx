@@ -92,19 +92,23 @@ For decades, scientists relied on **Directed Evolution** — mutating natural pr
 
 **RFDiffusion** is a diffusion model for protein structures. Just like image generators (Stable Diffusion, DALL·E) start from random noise and iteratively refine it into a picture, RFDiffusion starts from random 3D coordinates and denoises them into a valid protein backbone. You specify constraints — "make it 100 residues long" or "make it bind to this target" — and the model hallucinates a novel fold that satisfies those constraints.
 
-**ProteinMPNN** solves the *inverse folding* problem: given a 3D backbone, what amino acid sequence will fold into that exact shape? It's the bridge between structure (what you designed) and sequence (what you can actually synthesize as DNA). The **self-consistency check** closes the loop: you fold the designed sequence with AlphaFold/ESMFold and measure how closely it matches the original backbone. An RMSD below 2.0 Å means your design is likely to fold correctly in reality.`,
+**ProteinMPNN** solves the *inverse folding* problem: given a 3D backbone, what amino acid sequence will fold into that exact shape? It's the bridge between structure (what you designed) and sequence (what you can actually synthesize as DNA). The **self-consistency check** closes the loop: you fold the designed sequence with AlphaFold/ESMFold and measure how closely it matches the original backbone. An RMSD below 2.0 Å means your design is likely to fold correctly in reality.
+
+**Looking ahead:** This pipeline validates *static structure* — does the protein fold correctly? But proteins are not rigid objects. Their biological functions depend on how they move: vibrating, flexing, and changing shape. In March 2026, MIT's VibeGen introduced a dynamics-first approach — designing proteins by specifying target *vibrational modes* (patterns of motion) rather than static shapes. This represents the next frontier: designing not just what a protein looks like, but how it moves.`,
             keyTerms: [
                 { term: "RFDiffusion", definition: "A generative AI model that creates novel protein backbones by reversing a diffusion (noising) process. Developed at the Baker Lab, University of Washington." },
                 { term: "ProteinMPNN", definition: "A neural network that solves inverse folding — designing amino acid sequences that will fold into a given 3D backbone structure." },
                 { term: "Inverse Folding", definition: "The reverse of structure prediction: given a target 3D structure, find a sequence that folds into it. The key step between computational design and DNA synthesis." },
                 { term: "RMSD", definition: "Root Mean Square Deviation — measures how far two protein structures deviate in 3D space (in Ångströms). Lower = more similar. Below 2.0 Å is considered a successful design." },
                 { term: "Self-Consistency Score", definition: "A validation metric: design a sequence for a backbone, fold it, and compare. If the predicted fold matches the intended backbone (RMSD < 2 Å), the design is self-consistent." },
-                { term: "Backbone", definition: "The repeating N-Cα-C chain that forms the structural skeleton of a protein. Side chains (which determine function) branch off from each Cα atom." }
+                { term: "Backbone", definition: "The repeating N-Cα-C chain that forms the structural skeleton of a protein. Side chains (which determine function) branch off from each Cα atom." },
+                { term: "Normal Mode", definition: "A pattern of collective atomic motion (vibration) in a protein. Low-frequency normal modes describe large-scale functional movements like domain opening, hinge bending, and breathing motions. Emerging tools like VibeGen use these as design targets." }
             ],
             readingLinks: [
                 { title: "RFDiffusion: De novo protein design by deep network hallucination (Nature, 2023)", url: "https://www.nature.com/articles/s41586-023-06415-8" },
                 { title: "ProteinMPNN paper (Science, 2022)", url: "https://www.science.org/doi/10.1126/science.add2187" },
-                { title: "AI-Driven Protein Design Roadmap (Nature Reviews Bioengineering, 2025)", url: "https://www.nature.com/articles/s44222-024-00282-6" }
+                { title: "AI-Driven Protein Design Roadmap (Nature Reviews Bioengineering, 2025)", url: "https://www.nature.com/articles/s44222-024-00282-6" },
+                { title: "VibeGen: Dynamics-first protein design (Matter, 2026)", url: "https://www.sciencedirect.com/science/article/pii/S259023852600069X" }
             ],
             preLabQuestions: [
                 "Why can't we just use AlphaFold alone to design new proteins? What role does RFDiffusion fill?",
@@ -149,35 +153,44 @@ For decades, scientists relied on **Directed Evolution** — mutating natural pr
             "1D vs. 3D Tokens: Understanding SaProt and StructTokenBench.",
             "Diffusion Models: How 'denoising' creates new protein backbones.",
             "Sequence-Structure Co-Design: The APM 'All-Atom' breakthrough.",
-            "Controllable Hallucination: Designing for specific oligomeric states."
+            "Controllable Hallucination: Designing for specific oligomeric states.",
+            "Beyond Static Design: VibeGen and dynamics-first protein generation."
         ],
         caseStudy: "AlphaDesign: Creating inhibitors for bacterial defense systems.",
         lab: "In-silico Design: Generating a binder for a generic target.",
         requiresGpu: true,
         colabUrl: "https://colab.research.google.com/github/JobAiReady/lagos-bio-design/blob/main/notebooks/Module3_Binder.ipynb",
+        bonusColabUrl: "https://colab.research.google.com/github/JobAiReady/lagos-bio-design/blob/main/notebooks/Module3_VibeGen_Demo.ipynb",
         lessonContent: {
             summary: `Protein Language Models (PLMs) are the biological equivalent of GPT — trained on millions of protein sequences to learn the "grammar" of biology. Just as GPT predicts the next word in a sentence, ESM-2 and similar models predict the next amino acid in a sequence, building deep representations of protein structure and function.
 
 **Binder design** is the killer application of generative protein engineering. A binder is a protein designed to physically attach to a specific target — like a custom-made lock for a particular key. In medicine, binders are the basis of antibody drugs, diagnostic reagents, and biosensors. RFDiffusion can generate binder backbones by conditioning the diffusion process on a target structure: you specify which surface ("hotspot") you want to bind, and the model hallucinates a complementary protein that grips that surface.
 
-The concept of **"hallucination as a feature"** distinguishes generative biology from traditional AI concerns. In language models, hallucination means generating false information — a bug. In protein design, hallucination means generating structures that have never existed in nature — a feature. The key is *controllable* hallucination: specifying constraints (bind here, fold like this, be this size) while letting the model freely explore the vast space of possible protein structures.`,
+The concept of **"hallucination as a feature"** distinguishes generative biology from traditional AI concerns. In language models, hallucination means generating false information — a bug. In protein design, hallucination means generating structures that have never existed in nature — a feature. The key is *controllable* hallucination: specifying constraints (bind here, fold like this, be this size) while letting the model freely explore the vast space of possible protein structures.
+
+**VibeGen** (MIT, 2026) pushes controllable hallucination further — from static shapes to dynamic motions. Instead of specifying a target fold, you specify a target *vibrational fingerprint* (a normal mode describing how the protein should flex and move), and VibeGen generates sequences that exhibit those exact dynamics. It uses an **agentic dual-model architecture**: a "designer" proposes candidate sequences, a "predictor" critiques their dynamic accuracy, and they iterate in a propose→critique→refine loop until the motion goals are met. Where RFDiffusion hallucinates *shapes*, VibeGen hallucinates *motions*. The code and model weights are openly available on [GitHub](https://github.com/lamm-mit/ModeShapeDiffusionDesign) and [HuggingFace](https://huggingface.co/lamm-mit/VibeGen) (Apache-2.0 license).`,
             keyTerms: [
                 { term: "Protein Language Model (PLM)", definition: "A neural network trained on millions of protein sequences to learn the statistical patterns of amino acid usage. ESM-2, ProtGPT2, and ProGen are examples." },
                 { term: "Binder", definition: "A protein designed to physically attach to a specific target surface. The basis for antibody drugs, diagnostics, and biosensors." },
                 { term: "Hotspot Residues", definition: "The specific amino acid positions on a target protein's surface that contribute most to binding energy. These are the 'anchors' a binder grips onto." },
                 { term: "Interface Energy", definition: "The calculated strength of interaction between a binder and its target. More negative values indicate stronger binding." },
                 { term: "Diffusion Model", definition: "A generative AI technique that creates new data by learning to reverse a gradual noising process. Applied to 3D coordinates for protein backbone generation." },
-                { term: "pAE (Predicted Aligned Error)", definition: "AlphaFold's metric for how confident it is about the relative positions of different parts of the structure. Low pAE at an interface suggests a real interaction." }
+                { term: "pAE (Predicted Aligned Error)", definition: "AlphaFold's metric for how confident it is about the relative positions of different parts of the structure. Low pAE at an interface suggests a real interaction." },
+                { term: "VibeGen", definition: "A generative AI framework (MIT, 2026) that designs de novo proteins conditioned on target vibrational modes — how the protein should move — rather than static structure. Uses language diffusion models and an agentic designer-predictor loop." },
+                { term: "Agentic Design Loop", definition: "An iterative propose→critique→refine architecture where a generator model creates candidates and an evaluator model scores them, collaborating over multiple rounds to improve output quality. Used in VibeGen's dual-model system." }
             ],
             readingLinks: [
                 { title: "De novo design of protein structure and function with RFdiffusion (Nature, 2023)", url: "https://www.nature.com/articles/s41586-023-06415-8" },
                 { title: "ESM-2: Language models of protein sequences at the scale of evolution (Science, 2023)", url: "https://www.science.org/doi/10.1126/science.ade2574" },
-                { title: "Protein design with guided discrete diffusion (NeurIPS, 2023)", url: "https://arxiv.org/abs/2305.20009" }
+                { title: "Protein design with guided discrete diffusion (NeurIPS, 2023)", url: "https://arxiv.org/abs/2305.20009" },
+                { title: "VibeGen: Dynamics-first protein design (Matter, 2026)", url: "https://www.sciencedirect.com/science/article/pii/S259023852600069X" },
+                { title: "VibeGen Colab Demo (upstream)", url: "https://github.com/lamm-mit/ModeShapeDiffusionDesign/tree/main/colab_demo" }
             ],
             preLabQuestions: [
                 "How is 'hallucination' in protein design different from hallucination in ChatGPT?",
                 "What information does a PLM learn from millions of protein sequences without any 3D structure labels?",
-                "Why is binder design considered the most commercially valuable application of generative protein engineering?"
+                "Why is binder design considered the most commercially valuable application of generative protein engineering?",
+                "How does designing a protein for a specific *motion* differ from designing it for a specific *shape*? What new applications might this unlock?"
             ]
         },
         labContent: {
@@ -227,7 +240,9 @@ The concept of **"hallucination as a feature"** distinguishes generative biology
 
 The **design-build-test-learn (DBTL) loop** is the engine of modern bioengineering. In the "design" phase, you use RFDiffusion + ProteinMPNN to generate candidate binders. In "build," you would order synthetic DNA encoding your designs (companies like Twist Bioscience can synthesize any sequence for ~$0.07/base). In "test," you express the protein and measure binding affinity. In "learn," you feed the results back into the next design round. Current state-of-the-art achieves a **19% experimental success rate** for computationally designed binders — a number that sounds low but is revolutionary compared to the <0.1% hit rate of traditional screening.
 
-**Epitope mapping** is the critical first step: identifying which region of the GPC surface is conserved across Lassa virus lineages (so your binder works against all strains) and accessible (not buried inside the protein). You'll use sequence conservation analysis and structural visualization to select the optimal binding site before generating candidates.`,
+**Epitope mapping** is the critical first step: identifying which region of the GPC surface is conserved across Lassa virus lineages (so your binder works against all strains) and accessible (not buried inside the protein). You'll use sequence conservation analysis and structural visualization to select the optimal binding site before generating candidates.
+
+**Future direction:** The Lassa GPC undergoes significant conformational changes during viral entry — it's not a static target. Dynamics-aware tools like VibeGen could eventually enable binders that exploit or lock specific GPC motions, adding a new dimension beyond today's static shape-matching pipeline.`,
             keyTerms: [
                 { term: "GPC (Glycoprotein Complex)", definition: "The surface protein of Lassa virus that mediates entry into human cells. The primary target for diagnostic and therapeutic protein design." },
                 { term: "Epitope", definition: "The specific region on a target protein's surface that a binder recognizes and attaches to. A good epitope is conserved, accessible, and functionally important." },
@@ -294,7 +309,9 @@ The **design-build-test-learn (DBTL) loop** is the engine of modern bioengineeri
 
 **FoldMark** is a watermarking framework that embeds detectable signatures into AI-designed protein structures — analogous to watermarks in AI-generated images. By analyzing structural features that are statistically unlikely in natural proteins, researchers can determine whether a protein was computationally designed. This is a first step toward auditing and accountability in the era of generative biology.
 
-**Embedding-based screening** is the computational approach you'll use in this lab. Rather than comparing sequences letter-by-letter (like BLAST), you encode proteins as high-dimensional vectors using ESM-2 and measure similarity in embedding space. This catches functional analogs that share no sequence similarity — a critical capability since dangerous proteins can be redesigned to evade traditional sequence-based screening. The Nigerian regulatory landscape for biotech is still evolving, making it essential for the next generation of bio-engineers to understand and advocate for responsible frameworks.`,
+**Embedding-based screening** is the computational approach you'll use in this lab. Rather than comparing sequences letter-by-letter (like BLAST), you encode proteins as high-dimensional vectors using ESM-2 and measure similarity in embedding space. This catches functional analogs that share no sequence similarity — a critical capability since dangerous proteins can be redesigned to evade traditional sequence-based screening. The Nigerian regulatory landscape for biotech is still evolving, making it essential for the next generation of bio-engineers to understand and advocate for responsible frameworks.
+
+**Emerging challenge:** As tools like VibeGen enable proteins designed for specific *dynamic behaviors* rather than static shapes, biosecurity screening must evolve beyond structure-based watermarking (like FoldMark) to also assess functional motions — a protein's "vibrational fingerprint" may become as important to audit as its fold.`,
             keyTerms: [
                 { term: "Dual-Use Research", definition: "Research that could be used for both beneficial and harmful purposes. In biotech, the same protein design tools that create medicines could theoretically create toxins." },
                 { term: "FoldMark", definition: "A proposed framework for watermarking AI-designed proteins by embedding detectable structural signatures that distinguish them from natural proteins." },

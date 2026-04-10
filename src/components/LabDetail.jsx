@@ -221,6 +221,17 @@ const LabDetail = ({ module, onClose }) => {
                                 </a>
                             )}
 
+                            {module.bonusColabUrl && (
+                                <a
+                                    href={module.bonusColabUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-lg shadow-lg shadow-purple-900/20 transition-all flex items-center justify-center gap-2 mb-3"
+                                >
+                                    <FileCode size={18} /> Bonus Lab: VibeGen Demo
+                                </a>
+                            )}
+
                             <button
                                 onClick={() => window.location.href = '/workspace'}
                                 className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-lg shadow-lg shadow-emerald-900/20 transition-all flex items-center justify-center gap-2"
