@@ -87,6 +87,8 @@ For decades, scientists relied on **Directed Evolution** — mutating natural pr
         lab: "Pipeline Construction: Linking RFDiffusion output to ProteinMPNN.",
         requiresGpu: true,
         colabUrl: "https://colab.research.google.com/github/JobAiReady/lagos-bio-design/blob/main/notebooks/Module2_Pipeline.ipynb",
+        bonusColabUrl: "https://colab.research.google.com/github/JobAiReady/lagos-bio-design/blob/main/notebooks/Module2_BioEmu_Stability.ipynb",
+        bonusColabLabel: "Bonus Lab: Stability Validation",
         lessonContent: {
             summary: `Modern protein engineering follows a systematic 7-step roadmap, published in the 2025 Nature Reviews Bioengineering framework. The three tools at the core of this bootcamp — **RFDiffusion**, **ProteinMPNN**, and **AlphaFold** — map directly onto this roadmap as the Structure Generator, Sequence Designer, and Validator respectively.
 
@@ -94,7 +96,9 @@ For decades, scientists relied on **Directed Evolution** — mutating natural pr
 
 **ProteinMPNN** solves the *inverse folding* problem: given a 3D backbone, what amino acid sequence will fold into that exact shape? It's the bridge between structure (what you designed) and sequence (what you can actually synthesize as DNA). The **self-consistency check** closes the loop: you fold the designed sequence with AlphaFold/ESMFold and measure how closely it matches the original backbone. An RMSD below 2.0 Å means your design is likely to fold correctly in reality.
 
-**Looking ahead:** This pipeline validates *static structure* — does the protein fold correctly? But proteins are not rigid objects. Their biological functions depend on how they move: vibrating, flexing, and changing shape. In March 2026, MIT's VibeGen introduced a dynamics-first approach — designing proteins by specifying target *vibrational modes* (patterns of motion) rather than static shapes. This represents the next frontier: designing not just what a protein looks like, but how it moves.`,
+**Looking ahead:** This pipeline validates *static structure* — does the protein fold correctly? But a passing self-consistency score doesn't guarantee the design will work in the lab. Early computational designs (2018–2022) often had excellent predicted metrics — high pLDDT, low RMSD — yet aggregated, misfolded, or existed as molten globules when synthesized, because they were *conformationally unstable*. In 2025, Microsoft's **BioEmu-1** (*Science*, 2025) addressed this gap: given only an amino acid sequence, it generates thousands of conformational snapshots per hour — essentially predicting how the protein behaves over time. If >90% of the ensemble stays in one compact fold, the design is likely stable; if it samples many unfolded states, that's a red flag static validation missed. AlphaFold gives you a photograph of your protein at its best moment; BioEmu gives you the security camera footage.
+
+Proteins are also not rigid objects more broadly: their biological functions depend on how they move — vibrating, flexing, and changing shape. In March 2026, MIT's **VibeGen** introduced a dynamics-first *design* approach — generating proteins by specifying target vibrational modes rather than static shapes. Together, BioEmu (predict dynamics) and VibeGen (design for dynamics) define the next frontier: not just what a protein looks like, but how it moves.`,
             keyTerms: [
                 { term: "RFDiffusion", definition: "A generative AI model that creates novel protein backbones by reversing a diffusion (noising) process. Developed at the Baker Lab, University of Washington." },
                 { term: "ProteinMPNN", definition: "A neural network that solves inverse folding — designing amino acid sequences that will fold into a given 3D backbone structure." },
@@ -102,18 +106,22 @@ For decades, scientists relied on **Directed Evolution** — mutating natural pr
                 { term: "RMSD", definition: "Root Mean Square Deviation — measures how far two protein structures deviate in 3D space (in Ångströms). Lower = more similar. Below 2.0 Å is considered a successful design." },
                 { term: "Self-Consistency Score", definition: "A validation metric: design a sequence for a backbone, fold it, and compare. If the predicted fold matches the intended backbone (RMSD < 2 Å), the design is self-consistent." },
                 { term: "Backbone", definition: "The repeating N-Cα-C chain that forms the structural skeleton of a protein. Side chains (which determine function) branch off from each Cα atom." },
-                { term: "Normal Mode", definition: "A pattern of collective atomic motion (vibration) in a protein. Low-frequency normal modes describe large-scale functional movements like domain opening, hinge bending, and breathing motions. Emerging tools like VibeGen use these as design targets." }
+                { term: "Normal Mode", definition: "A pattern of collective atomic motion (vibration) in a protein. Low-frequency normal modes describe large-scale functional movements like domain opening, hinge bending, and breathing motions. Emerging tools like VibeGen use these as design targets." },
+                { term: "Conformational Ensemble", definition: "The collection of different 3D shapes a single protein can adopt due to thermal motion. A static prediction (AlphaFold/ESMFold) shows one snapshot; the ensemble shows the full distribution. BioEmu-1 generates thousands of these per hour, revealing whether a design is truly stable or flickers between states." },
+                { term: "Protein Stability", definition: "A measure of how strongly a protein favors its folded state over unfolded states. A protein with good RMSD but poor stability may aggregate or misfold under real conditions. BioEmu-1 predicts stability by sampling the equilibrium ensemble — if most samples occupy a single compact fold, the design is stable." }
             ],
             readingLinks: [
                 { title: "RFDiffusion: De novo protein design by deep network hallucination (Nature, 2023)", url: "https://www.nature.com/articles/s41586-023-06415-8" },
                 { title: "ProteinMPNN paper (Science, 2022)", url: "https://www.science.org/doi/10.1126/science.add2187" },
                 { title: "AI-Driven Protein Design Roadmap (Nature Reviews Bioengineering, 2025)", url: "https://www.nature.com/articles/s44222-024-00282-6" },
-                { title: "VibeGen: Dynamics-first protein design (Matter, 2026)", url: "https://www.sciencedirect.com/science/article/pii/S259023852600069X" }
+                { title: "VibeGen: Dynamics-first protein design (Matter, 2026)", url: "https://www.sciencedirect.com/science/article/pii/S259023852600069X" },
+                { title: "BioEmu-1: Scalable emulation of protein equilibrium ensembles (Science, 2025)", url: "https://www.science.org/doi/10.1126/science.adv9817" }
             ],
             preLabQuestions: [
                 "Why can't we just use AlphaFold alone to design new proteins? What role does RFDiffusion fill?",
                 "What does an RMSD of 0.8 Å tell you compared to an RMSD of 3.5 Å?",
-                "In what order do the three tools (AlphaFold, RFDiffusion, ProteinMPNN) execute in the design pipeline?"
+                "In what order do the three tools (AlphaFold, RFDiffusion, ProteinMPNN) execute in the design pipeline?",
+                "Your Module 2 design passed the self-consistency check (RMSD < 2.0 Å). Can you think of reasons why it might still fail in the lab? What would you want to check beyond the static fold?"
             ]
         },
         labContent: {
@@ -168,7 +176,9 @@ For decades, scientists relied on **Directed Evolution** — mutating natural pr
 
 The concept of **"hallucination as a feature"** distinguishes generative biology from traditional AI concerns. In language models, hallucination means generating false information — a bug. In protein design, hallucination means generating structures that have never existed in nature — a feature. The key is *controllable* hallucination: specifying constraints (bind here, fold like this, be this size) while letting the model freely explore the vast space of possible protein structures.
 
-**VibeGen** (MIT, 2026) pushes controllable hallucination further — from static shapes to dynamic motions. Instead of specifying a target fold, you specify a target *vibrational fingerprint* (a normal mode describing how the protein should flex and move), and VibeGen generates sequences that exhibit those exact dynamics. It uses an **agentic dual-model architecture**: a "designer" proposes candidate sequences, a "predictor" critiques their dynamic accuracy, and they iterate in a propose→critique→refine loop until the motion goals are met. Where RFDiffusion hallucinates *shapes*, VibeGen hallucinates *motions*. The code and model weights are openly available on [GitHub](https://github.com/lamm-mit/ModeShapeDiffusionDesign) and [HuggingFace](https://huggingface.co/lamm-mit/VibeGen) (Apache-2.0 license).`,
+**VibeGen** (MIT, 2026) pushes controllable hallucination further — from static shapes to dynamic motions. Instead of specifying a target fold, you specify a target *vibrational fingerprint* (a normal mode describing how the protein should flex and move), and VibeGen generates sequences that exhibit those exact dynamics. It uses an **agentic dual-model architecture**: a "designer" proposes candidate sequences, a "predictor" critiques their dynamic accuracy, and they iterate in a propose→critique→refine loop until the motion goals are met. Where RFDiffusion hallucinates *shapes*, VibeGen hallucinates *motions*. The code and model weights are openly available on [GitHub](https://github.com/lamm-mit/ModeShapeDiffusionDesign) and [HuggingFace](https://huggingface.co/lamm-mit/VibeGen) (Apache-2.0 license).
+
+On the validation side, Microsoft's **BioEmu-1** (*Science*, 2025) complements VibeGen by predicting whether a designed protein's conformational ensemble actually matches the intended dynamics — it's the "reality check" for dynamics-designed proteins, generating thousands of equilibrium structures per hour to verify that the target motions truly emerge.`,
             keyTerms: [
                 { term: "Protein Language Model (PLM)", definition: "A neural network trained on millions of protein sequences to learn the statistical patterns of amino acid usage. ESM-2, ProtGPT2, and ProGen are examples." },
                 { term: "Binder", definition: "A protein designed to physically attach to a specific target surface. The basis for antibody drugs, diagnostics, and biosensors." },
@@ -242,7 +252,7 @@ The **design-build-test-learn (DBTL) loop** is the engine of modern bioengineeri
 
 **Epitope mapping** is the critical first step: identifying which region of the GPC surface is conserved across Lassa virus lineages (so your binder works against all strains) and accessible (not buried inside the protein). You'll use sequence conservation analysis and structural visualization to select the optimal binding site before generating candidates.
 
-**Future direction:** The Lassa GPC undergoes significant conformational changes during viral entry — it's not a static target. Dynamics-aware tools like VibeGen could eventually enable binders that exploit or lock specific GPC motions, adding a new dimension beyond today's static shape-matching pipeline.`,
+**Future direction:** The Lassa GPC undergoes significant conformational changes during viral entry — it's not a static target. Dynamics-aware tools like VibeGen could eventually enable binders that exploit or lock specific GPC motions, adding a new dimension beyond today's static shape-matching pipeline. Microsoft's BioEmu-1 (*Science*, 2025) could further strengthen this pipeline by predicting whether designed binders maintain their fold across the GPC's conformational ensemble — ensuring the binder works not just against one static snapshot but across the range of shapes the virus actually adopts during entry.`,
             keyTerms: [
                 { term: "GPC (Glycoprotein Complex)", definition: "The surface protein of Lassa virus that mediates entry into human cells. The primary target for diagnostic and therapeutic protein design." },
                 { term: "Epitope", definition: "The specific region on a target protein's surface that a binder recognizes and attaches to. A good epitope is conserved, accessible, and functionally important." },
@@ -311,7 +321,7 @@ The **design-build-test-learn (DBTL) loop** is the engine of modern bioengineeri
 
 **Embedding-based screening** is the computational approach you'll use in this lab. Rather than comparing sequences letter-by-letter (like BLAST), you encode proteins as high-dimensional vectors using ESM-2 and measure similarity in embedding space. This catches functional analogs that share no sequence similarity — a critical capability since dangerous proteins can be redesigned to evade traditional sequence-based screening. The Nigerian regulatory landscape for biotech is still evolving, making it essential for the next generation of bio-engineers to understand and advocate for responsible frameworks.
 
-**Emerging challenge:** As tools like VibeGen enable proteins designed for specific *dynamic behaviors* rather than static shapes, biosecurity screening must evolve beyond structure-based watermarking (like FoldMark) to also assess functional motions — a protein's "vibrational fingerprint" may become as important to audit as its fold.`,
+**Emerging challenge:** As tools like VibeGen enable proteins designed for specific *dynamic behaviors* rather than static shapes, biosecurity screening must evolve beyond structure-based watermarking (like FoldMark) to also assess functional motions — a protein's "vibrational fingerprint" may become as important to audit as its fold. Tools like BioEmu-1 (Microsoft, *Science* 2025) that rapidly predict protein stability could also flag designs with unusual thermodynamic profiles — a protein engineered to be unnaturally stable (resistant to heat, pH extremes, or proteases) may warrant additional biosecurity screening beyond what FoldMark's structural watermarks can detect.`,
             keyTerms: [
                 { term: "Dual-Use Research", definition: "Research that could be used for both beneficial and harmful purposes. In biotech, the same protein design tools that create medicines could theoretically create toxins." },
                 { term: "FoldMark", definition: "A proposed framework for watermarking AI-designed proteins by embedding detectable structural signatures that distinguish them from natural proteins." },

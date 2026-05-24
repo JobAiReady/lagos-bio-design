@@ -228,7 +228,7 @@ const LabDetail = ({ module, onClose }) => {
                                     rel="noopener noreferrer"
                                     className="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-lg shadow-lg shadow-purple-900/20 transition-all flex items-center justify-center gap-2 mb-3"
                                 >
-                                    <FileCode size={18} /> Bonus Lab: VibeGen Demo
+                                    <FileCode size={18} /> {module.bonusColabLabel || 'Bonus Lab: VibeGen Demo'}
                                 </a>
                             )}
 

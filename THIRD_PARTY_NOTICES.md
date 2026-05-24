@@ -58,6 +58,14 @@ This project references, links to, or uses at runtime the following third-party 
 - **License**: Apache-2.0
 - **Usage**: Installed at runtime in Colab for single-sequence structure prediction in VibeGen demo (Module 3 Bonus Lab)
 
+### BioEmu-1 (Biomolecular Emulator)
+- **Authors**: Lewis, S., Hempel, T., Jiménez-Luna, J., et al. (Microsoft Research)
+- **Paper**: "Scalable emulation of protein equilibrium ensembles with generative deep learning" — *Science* (2025)
+- **Repository**: https://github.com/microsoft/bioemu
+- **Model Weights**: https://huggingface.co/microsoft/bioemu
+- **License**: MIT
+- **Usage**: Installed via pip at runtime in Colab for conformational ensemble generation and stability validation (Module 2 Bonus Lab)
+
 ---
 
 ## Protein Structure Data
@@ -106,6 +114,7 @@ Lesson content references the following published works via hyperlinks. No paper
 4. Lin et al. (2023). "Evolutionary-scale prediction of atomic-level protein structure with a language model." *Science* 379, 1123–1130.
 5. Nobel Prize in Chemistry 2024. https://www.nobelprize.org/prizes/chemistry/2024/summary/
 6. Ni, B. & Buehler, M.J. (2026). "VibeGen: Agentic end-to-end de novo protein design for tailored dynamics using a language diffusion model." *Matter*.
+7. Lewis et al. (2025). "Scalable emulation of protein equilibrium ensembles with generative deep learning." *Science*.
 
 ---
 

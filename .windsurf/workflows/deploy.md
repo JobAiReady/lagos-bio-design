@@ -1,13 +1,15 @@
 ---
-description: How to deploy the Lagos Bio-Design Bootcamp frontend to Netlify
+description: How to deploy the Lagos Bio-Design Bootcamp frontend to Cloudflare Workers
 ---
 
-## Prerequisites
-- Project builds cleanly (`npm run build` produces `dist/`)
-- `netlify.toml` exists with build command and publish dir
-- Environment variables are known (VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY, VITE_ACCESS_CODE)
+## Overview
+The project is **git-connected** to Cloudflare Workers. Pushes to `main` trigger automatic builds and deploys — no manual steps needed for routine deploys.
 
-## Steps
+- **Primary URL**: https://bootcamp.jobaiready.ai
+- **Workers.dev**: https://lagos-bio-design.bitter-credit-3991.workers.dev
+- **Config**: `wrangler.jsonc` (SPA routing via `not_found_handling: "single-page-application"`)
+
+## Auto-Deploy (default)
 
 1. Verify the build passes locally:
 // turbo
@@ -15,24 +17,37 @@ description: How to deploy the Lagos Bio-Design Bootcamp frontend to Netlify
 npm run build
 ```
 
-2. Ensure `netlify.toml` exists at project root with:
-   - `command = "npm run build"`
-   - `publish = "dist"`
-   - SPA redirect rule (`/* -> /index.html`)
+2. Commit and push to `main`:
+```bash
+git add -A
+git commit -m "your commit message"
+git push origin main
+```
 
-3. Commit any uncommitted changes before deploying.
+3. Cloudflare auto-builds: `npm run build` → `npx wrangler deploy` → live.
 
-4. Deploy using the deploy_web_app tool:
-   - Framework: Not applicable (Vite+React is not in the list; leave unset or use closest match)
-   - ProjectPath: `c:\dev\LBD`
-   - Subdomain: `lagos-bio-design` (or as specified by user)
+4. Verify the live site at https://bootcamp.jobaiready.ai.
 
-5. After deployment, set environment variables in Netlify dashboard:
-   - `VITE_SUPABASE_URL`
-   - `VITE_SUPABASE_ANON_KEY`
-   - `VITE_ACCESS_CODE`
-   Note: VITE_ vars are inlined at build time by Vite, so a rebuild/redeploy is needed after setting them.
+## Manual Deploy (if auto-deploy fails)
 
-6. Trigger a redeploy from Netlify after env vars are set.
+1. Build locally:
+// turbo
+```bash
+npm run build
+```
 
-7. Verify the live site loads and the Supabase connection works.
+2. Deploy with wrangler:
+```bash
+npx wrangler deploy
+```
+
+## Environment Variables
+VITE_ vars are inlined at build time by Vite. They are set in the `.env` file locally and picked up during the Cloudflare build step:
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+- `VITE_ACCESS_CODE`
+
+If env vars change, a rebuild/redeploy is needed.
+
+## Legacy
+- `netlify.toml` still exists in the repo but Netlify deploys are **paused**. The old Netlify site was at `lagos-bio-design.netlify.app`.
