@@ -9,10 +9,12 @@ CREATE TABLE IF NOT EXISTS public.certificates (
 ALTER TABLE public.certificates ENABLE ROW LEVEL SECURITY;
 
 -- Users can view their own certificate
+DROP POLICY IF EXISTS "Users can view own certificate" ON public.certificates;
 CREATE POLICY "Users can view own certificate" ON public.certificates
   FOR SELECT USING (auth.uid() = user_id);
 
 -- Public verification by code (narrow access)
+DROP POLICY IF EXISTS "Anyone can verify by code" ON public.certificates;
 CREATE POLICY "Anyone can verify by code" ON public.certificates
   FOR SELECT USING (true);
 -- Note: the verification page will filter by verification_code,

@@ -10,13 +10,16 @@ CREATE TABLE IF NOT EXISTS public.gallery_likes (
 ALTER TABLE public.gallery_likes ENABLE ROW LEVEL SECURITY;
 
 -- Users can manage their own likes
+DROP POLICY IF EXISTS "Users can insert own likes" ON public.gallery_likes;
 CREATE POLICY "Users can insert own likes" ON public.gallery_likes
   FOR INSERT WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can delete own likes" ON public.gallery_likes;
 CREATE POLICY "Users can delete own likes" ON public.gallery_likes
   FOR DELETE USING (auth.uid() = user_id);
 
 -- Anyone can view likes (for counting)
+DROP POLICY IF EXISTS "Anyone can view likes" ON public.gallery_likes;
 CREATE POLICY "Anyone can view likes" ON public.gallery_likes
   FOR SELECT USING (true);
 

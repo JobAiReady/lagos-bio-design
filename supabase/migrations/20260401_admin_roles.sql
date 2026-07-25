@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS public.admin_roles (
 ALTER TABLE public.admin_roles ENABLE ROW LEVEL SECURITY;
 
 -- Only admins can see admin_roles
+DROP POLICY IF EXISTS "Admins can view roles" ON public.admin_roles;
 CREATE POLICY "Admins can view roles" ON public.admin_roles
   FOR SELECT USING (auth.uid() = user_id);
 

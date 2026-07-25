@@ -40,18 +40,21 @@ CREATE INDEX IF NOT EXISTS idx_user_progress_updated_at
 ALTER TABLE public.user_progress ENABLE ROW LEVEL SECURITY;
 
 -- Users can view their own progress
+DROP POLICY IF EXISTS "Users can view own progress" ON public.user_progress;
 CREATE POLICY "Users can view own progress"
   ON public.user_progress
   FOR SELECT
   USING (auth.uid() = user_id);
 
 -- Users can insert their own progress
+DROP POLICY IF EXISTS "Users can insert own progress" ON public.user_progress;
 CREATE POLICY "Users can insert own progress"
   ON public.user_progress
   FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
 -- Users can update their own progress
+DROP POLICY IF EXISTS "Users can update own progress" ON public.user_progress;
 CREATE POLICY "Users can update own progress"
   ON public.user_progress
   FOR UPDATE
@@ -59,6 +62,7 @@ CREATE POLICY "Users can update own progress"
   WITH CHECK (auth.uid() = user_id);
 
 -- Users can delete their own progress (optional, for data privacy)
+DROP POLICY IF EXISTS "Users can delete own progress" ON public.user_progress;
 CREATE POLICY "Users can delete own progress"
   ON public.user_progress
   FOR DELETE

@@ -11,11 +11,13 @@ create table if not exists public.analytics_events (
 alter table public.analytics_events enable row level security;
 
 -- Policy: Users can insert their own events
+DROP POLICY IF EXISTS "Users can insert their own events" ON public.analytics_events;
 create policy "Users can insert their own events"
   on public.analytics_events for insert
   with check (auth.uid() = user_id);
 
 -- Policy: Users can view their own events (optional, maybe for debugging)
+DROP POLICY IF EXISTS "Users can view their own events" ON public.analytics_events;
 create policy "Users can view their own events"
   on public.analytics_events for select
   using (auth.uid() = user_id);
@@ -24,6 +26,7 @@ create policy "Users can view their own events"
 -- For MVP, we'll hardcode the admin email or use a specific claim if available.
 -- Ideally, you'd have an 'admins' table or role.
 -- Uses admin_roles table for role-based access (see migrations/20260401_admin_roles.sql)
+DROP POLICY IF EXISTS "Admins can view all events" ON public.analytics_events;
 create policy "Admins can view all events"
   on public.analytics_events for select
   using (
