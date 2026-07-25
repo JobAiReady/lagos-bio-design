@@ -40,11 +40,10 @@ const PublishModal = ({ isOpen, onClose, runData, user, onPublishSuccess }) => {
                 title: sanitizedTitle,
                 description: sanitizedDescription,
                 tags: tagList,
-                run_id: runData?.id, // Link to the run if available
-                metrics: runData?.metrics,
-                // For now, we use a placeholder or the run's PDB if we had it
-                // In a real flow, we'd upload the PDB from the workspace state here
-                thumbnail_url: 'https://placehold.co/600x400/0f172a/10b981?text=Protein+Structure',
+                run_id: runData?.id, // Link to a persisted run when available
+                // No thumbnail is generated yet. Previously this stored a
+                // placehold.co URL, which the app's own CSP img-src blocks.
+                // ProteinCard already renders a "No Preview" state for null.
                 is_public: true
             };
 

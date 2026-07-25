@@ -181,24 +181,6 @@ const LabDetail = ({ module, onClose }) => {
 
                         {/* Right: Status & Tools */}
                         <div className="space-y-6">
-                            <div className="bg-slate-900 p-5 rounded-xl border border-slate-800">
-                                <h4 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">System Status</h4>
-                                <div className="space-y-3">
-                                    <div className="flex items-center justify-between text-sm">
-                                        <span className="text-slate-500">Environment</span>
-                                        <span className="text-emerald-400 font-mono">Active</span>
-                                    </div>
-                                    <div className="flex items-center justify-between text-sm">
-                                        <span className="text-slate-500">GPU Allocation</span>
-                                        <span className="text-emerald-400 font-mono">T4 Tensor Core</span>
-                                    </div>
-                                    <div className="flex items-center justify-between text-sm">
-                                        <span className="text-slate-500">Latency</span>
-                                        <span className="text-emerald-400 font-mono">24ms</span>
-                                    </div>
-                                </div>
-                            </div>
-
                             <div className="bg-blue-950/20 p-5 rounded-xl border border-blue-500/20">
                                 <h4 className="text-sm font-bold text-blue-400 uppercase tracking-wider mb-2 flex items-center gap-2">
                                     <AlertTriangle size={16} /> Required Tools

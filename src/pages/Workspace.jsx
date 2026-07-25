@@ -26,14 +26,14 @@ const WorkspaceContent = () => {
     const [isMobile, setIsMobile] = useState(false);
     const [isPublishOpen, setIsPublishOpen] = useState(false);
     const [isAiOpen, setIsAiOpen] = useState(false);
-    const { user, profile, loading } = useAuth();
+    const { user, profile, loading, isEnrolled } = useAuth();
 
     const { isPythonReady, isRunning, stage, error, output, appendOutput, retry, runScript } = usePyodide();
 
     // Redirect if not authenticated (wait for auth to finish loading)
     useEffect(() => {
-        if (!loading && !user) navigate('/');
-    }, [user, loading, navigate]);
+        if (!loading && (!user || !isEnrolled)) navigate('/');
+    }, [user, isEnrolled, loading, navigate]);
 
     // Handle window resize
     useEffect(() => {
@@ -70,7 +70,7 @@ const WorkspaceContent = () => {
         ));
     }, [activeFile]);
 
-    if (loading) {
+    if (loading || !user || !isEnrolled) {
         return (
             <div className="h-screen w-full bg-[#0f172a] flex items-center justify-center">
                 <div className="text-emerald-400 font-mono text-sm">Loading workspace...</div>
@@ -141,11 +141,16 @@ const WorkspaceContent = () => {
                 </div>
             </div>
 
+            {/*
+                runData is null: no lab run is persisted yet, so there are no real
+                metrics to attach. This previously passed hardcoded pLDDT/RMSD values.
+                See docs/INDEPENDENT_REVIEW_2026-07-24_v2.md §7 (upload-based rebuild).
+            */}
             <PublishModal
                 isOpen={isPublishOpen}
                 onClose={() => setIsPublishOpen(false)}
                 user={user}
-                runData={{ metrics: { pLDDT: 85.5, rmsd: 1.2 } }}
+                runData={null}
                 onPublishSuccess={() => {
                     appendOutput('> Design published to Gallery successfully!');
                 }}

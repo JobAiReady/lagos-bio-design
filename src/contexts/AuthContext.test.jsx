@@ -11,17 +11,31 @@ vi.mock('../lib/supabase', () => ({
             getSession: vi.fn(),
             onAuthStateChange: vi.fn(),
         },
+        from: vi.fn(),
+        rpc: vi.fn(),
     },
 }));
+
+// Wires up a profiles fetch returning `profile`, and an is_active_enrollment
+// RPC returning `enrollment`. Mirrors the two calls AuthContext makes.
+const mockProfileFetch = (profile, enrollment = { data: true, error: null }) => {
+    const single = vi.fn().mockResolvedValue({ data: profile, error: null });
+    const eq = vi.fn(() => ({ single }));
+    const select = vi.fn(() => ({ eq }));
+    supabase.from.mockReturnValue({ select });
+    supabase.rpc.mockResolvedValue(enrollment);
+    return { select };
+};
 
 import { supabase } from '../lib/supabase';
 
 const TestConsumer = () => {
-    const { user, loading } = useAuth();
+    const { user, loading, isEnrolled } = useAuth();
     return (
         <div>
             <span data-testid="loading">{String(loading)}</span>
             <span data-testid="user">{user ? user.email : 'null'}</span>
+            <span data-testid="enrolled">{String(isEnrolled)}</span>
         </div>
     );
 };
@@ -61,6 +75,69 @@ describe('AuthContext', () => {
         await waitFor(() => {
             expect(screen.getByTestId('loading').textContent).toBe('false');
             expect(screen.getByTestId('user').textContent).toBe('ada@example.com');
+        });
+    });
+
+    it('derives enrollment from the server profile', async () => {
+        supabase.auth.getSession.mockResolvedValueOnce({
+            data: { session: { user: { id: 'user-1', email: 'ada@example.com' } } },
+        });
+        const { select } = mockProfileFetch({ full_name: 'Ada', plan: 'free', cohort_id: 7 });
+
+        render(
+            <AuthProvider>
+                <TestConsumer />
+            </AuthProvider>
+        );
+
+        await waitFor(() => {
+            expect(screen.getByTestId('enrolled').textContent).toBe('true');
+        });
+        expect(supabase.from).toHaveBeenCalledWith('profiles');
+        expect(select).toHaveBeenCalledWith('full_name, plan, cohort_id');
+        expect(supabase.rpc).toHaveBeenCalledWith('is_active_enrollment');
+    });
+
+    it('is not enrolled when the cohort is no longer active', async () => {
+        supabase.auth.getSession.mockResolvedValueOnce({
+            data: { session: { user: { id: 'user-1', email: 'ada@example.com' } } },
+        });
+        // Profile still carries a cohort_id, but the cohort has been deactivated.
+        mockProfileFetch(
+            { full_name: 'Ada', plan: 'free', cohort_id: 7 },
+            { data: false, error: null }
+        );
+
+        render(
+            <AuthProvider>
+                <TestConsumer />
+            </AuthProvider>
+        );
+
+        await waitFor(() => {
+            expect(screen.getByTestId('loading').textContent).toBe('false');
+        });
+        expect(screen.getByTestId('enrolled').textContent).toBe('false');
+    });
+
+    it('falls back to cohort_id when the enrollment RPC is unavailable', async () => {
+        supabase.auth.getSession.mockResolvedValueOnce({
+            data: { session: { user: { id: 'user-1', email: 'ada@example.com' } } },
+        });
+        // e.g. the hardening migration has not been applied to this database.
+        mockProfileFetch(
+            { full_name: 'Ada', plan: 'free', cohort_id: 7 },
+            { data: null, error: { message: 'function does not exist' } }
+        );
+
+        render(
+            <AuthProvider>
+                <TestConsumer />
+            </AuthProvider>
+        );
+
+        await waitFor(() => {
+            expect(screen.getByTestId('enrolled').textContent).toBe('true');
         });
     });
 

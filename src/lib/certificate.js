@@ -61,11 +61,11 @@ export async function generateCertificatePDF(studentName, completionDate, verifi
     doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
     doc.text(
-        'has successfully completed all five modules of the Lagos Bio-Design Bootcamp,',
+        'has completed all five modules of the Lagos Bio-Design Bootcamp,',
         w / 2, 116, { align: 'center' }
     );
     doc.text(
-        'demonstrating proficiency in generative protein design using AlphaFold, RFDiffusion, and ProteinMPNN.',
+        'a curriculum covering generative protein design with AlphaFold, RFDiffusion, and ProteinMPNN.',
         w / 2, 123, { align: 'center' }
     );
 
@@ -97,6 +97,14 @@ export async function generateCertificatePDF(studentName, completionDate, verifi
     doc.setTextColor(100, 116, 139);
     doc.setFontSize(8);
     doc.text(`Verify: bootcamp.jobaiready.ai/verify/${verificationCode}`, 50, h - 28);
+
+    // Scope of the credential. This records curriculum completion as reported
+    // through the platform; it is not an assessment of laboratory competency.
+    doc.setFontSize(7);
+    doc.text(
+        'Records curriculum completion. Not an assessment of laboratory or research competency.',
+        50, h - 22
+    );
 
     // Powered by
     doc.setTextColor(100, 116, 139);
