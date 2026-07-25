@@ -43,6 +43,24 @@ deploy_key.pub
 # the root so anything under supabase/ is tracked.
 /*.sql
 
+# ---------------------------------------------------------------------------
+# TEMPORARY HOLD -- remove this block once LBD-15 is fixed.
+#
+# This repository is PUBLIC (it must be: the 7 curriculum labs are loaded via
+# colab.research.google.com/github/, which requires public read access).
+#
+# These files document security findings that are not yet fixed. Publishing a
+# severity-ranked inventory of live vulnerabilities, and a working exploit for
+# the certificate forge, would hand an attacker the roadmap. They are kept on
+# disk and run locally; they are simply not published yet.
+#
+# To publish: delete this block, then `git add` the four paths below.
+# Tracking issue: LBD-15 in docs/INDEPENDENT_REVIEW_2026-07-24_v2.md
+# ---------------------------------------------------------------------------
+docs/INDEPENDENT_REVIEW_2026-07-24.md
+docs/INDEPENDENT_REVIEW_2026-07-24_v2.md
+supabase/tests/cases/20_lbd15_certificate_forgeable.sql
+
 # AI conversation logs
 CONTEXTUAL_CONVERSATION.md
 PREVIOUS_CONVERSATION.md
