@@ -35,9 +35,13 @@ deploy_key.pub
 # Local Netlify folder
 .netlify
 
-# Dev artifacts / scratch SQL
-*.sql
-!supabase/migrations/*.sql
+# Scratch SQL at the repo root only (check_*.sql, fix_*.sql, etc.).
+#
+# This was previously a blanket `*.sql`, which silently hid real project source:
+# the baseline schema and security-hardening migrations went uncommitted for
+# months, and it would also have swallowed supabase/tests/. Anchor the rule to
+# the root so anything under supabase/ is tracked.
+/*.sql
 
 # AI conversation logs
 CONTEXTUAL_CONVERSATION.md
