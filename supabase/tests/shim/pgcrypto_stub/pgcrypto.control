@@ -1,0 +1,13 @@
+# TEST STUB -- not real pgcrypto.
+#
+# pgserver's bundled PostgreSQL does not ship contrib/pgcrypto, but the
+# migrations call CREATE EXTENSION pgcrypto and then use digest() and
+# gen_random_bytes(). This stub provides just that surface, implemented on
+# PostgreSQL's built-in sha*() functions, so the migrations can be applied
+# unmodified in tests.
+#
+# Do not use outside the test harness: gen_random_bytes() here is backed by
+# random() and is NOT cryptographically secure.
+comment = 'test stub for the pgcrypto surface used by LBD migrations'
+default_version = '1.3'
+relocatable = true

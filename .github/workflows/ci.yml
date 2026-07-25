@@ -27,3 +27,24 @@ jobs:
 
       - name: Build
         run: npm run build
+
+  database:
+    name: Database integration tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # pgserver bundles its own PostgreSQL 16 binaries, so no service container
+      # or Supabase CLI is needed. See supabase/tests/README.md.
+      - name: Install test dependencies
+        run: pip install pgserver "psycopg[binary]"
+
+      # Applies every migration, re-applies them to check idempotency, then runs
+      # the RLS cases. Fails on migration errors, non-idempotent migrations, or
+      # any failing case.
+      - name: Migrations and RLS tests
+        run: python3 supabase/tests/run_tests.py
